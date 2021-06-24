@@ -36,7 +36,7 @@ const ShareForm: React.FC<ShareFormProps> = ({ formOpened, user, file, setFormOp
                 async (files: FileFetchResponse): Promise<FileFetchResponse> => {
                     const updatedFile = await $api.patch<IFile>('/files/shareFile', {
                         fileId: file._id,
-                        userIds: usersAccess,
+                        userIds: usersAccess.map((u) => u._id),
                         rewrite: true,
                     })
                     const filteredFiles = files.owns.filter((file) => file._id !== updatedFile.data._id)

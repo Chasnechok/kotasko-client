@@ -1,8 +1,8 @@
+import { mutate } from 'swr'
 import { API_URL } from '.'
 import IFile from '../models/file'
 
 export default async function downloadFile(file: IFile) {
-    let error
     try {
         const link = document.createElement('a')
         link.href = `${API_URL}/files/download/${file._id}`
@@ -11,8 +11,7 @@ export default async function downloadFile(file: IFile) {
         link.click()
         link.remove()
     } catch (err) {
-        error = err.response || err
+        console.log(err)
+        mutate('/files/listForUser')
     }
-
-    return { error }
 }

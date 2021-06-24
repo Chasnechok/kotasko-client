@@ -1,12 +1,4 @@
-import {
-    Fragment,
-    ReactChild,
-    ReactElement,
-    FC,
-    useState,
-    useRef,
-    useCallback,
-} from 'react'
+import { Fragment, ReactChild, ReactElement, FC, useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import $api from '../http'
 import { useRouter } from 'next/router'
@@ -16,15 +8,11 @@ import Lsi from '../lsi/layout.lsi'
 import Logo from '../components/logo'
 import MenuIcon from '../components/layout/meni-icon'
 import BarLoader from 'react-spinners/BarLoader'
-import {
-    ClipboardCheckIcon,
-    FolderDownloadIcon,
-    CogIcon,
-    LogoutIcon,
-} from '@heroicons/react/outline'
-import { BellIcon } from '@heroicons/react/solid'
-import { useUser } from '../hooks/useFetchCollection'
+import { ClipboardCheckIcon, FolderDownloadIcon, CogIcon, LogoutIcon } from '@heroicons/react/outline'
+import { useNotifications, useUser } from '../hooks/useFetchCollection'
 import IUser from '../models/user'
+import Notifications from '../components/layout/notifications/notifications'
+import { useEffect } from 'react'
 
 type Renderable = ReactChild | Renderable[]
 
@@ -43,6 +31,7 @@ const Layout: FC_NoChildren<LayoutProps> = ({ children }) => {
     const [menuOpened, setMenuOpened] = useState(false)
     const mainRef = useRef<HTMLDivElement>()
     const closeMenu = useCallback(() => setMenuOpened(false), [setMenuOpened])
+
     function handleMenu(state) {
         const mainComponent = mainRef.current
         if (state && mainComponent) {
@@ -67,21 +56,21 @@ const Layout: FC_NoChildren<LayoutProps> = ({ children }) => {
         <Fragment>
             <div className="top-bar flex fixed items-center justify-between shadow-md px-10 py-3 z-20 w-full bg-white md:bg-transparent md:shadow-none">
                 <Logo className="justify-center" />
-                <MenuIcon menuOpened={menuOpened} handleMenu={handleMenu} />
-                <div className="user-info hidden md:flex gap-x-4 items-center">
-                    <BellIcon className="h-8 bg-white rounded-full shadow-md p-2" />
+
+                <div className="flex gap-x-4 relative items-center">
                     {loading && <BarLoader />}
+                    <Notifications />
+
                     {user && (
-                        <span className="cursor-default">
-                            {user.details.firstName +
-                                ' ' +
-                                user.details.lastName}
+                        <span className="cursor-default hidden md:inline">
+                            {user.details.firstName + ' ' + user.details.lastName}
                         </span>
                     )}
                 </div>
+                <MenuIcon menuOpened={menuOpened} handleMenu={handleMenu} />
             </div>
             <nav
-                className={`bg-white max-w-2xs h-full flex-1 flex flex-nowrap flex-col fixed  py-4 shadow-xl z-10
+                className={`bg-white max-w-2xs h-full flex-1 z-10 flex flex-nowrap flex-col fixed py-4 shadow-xl
                 transition-transform transform ${
                     menuOpened ? 'translate-x-0' : '-translate-x-full'
                 } md:transform-none md:relative`}
@@ -89,9 +78,7 @@ const Layout: FC_NoChildren<LayoutProps> = ({ children }) => {
                 <ul className="py-12">
                     <li
                         className={`px-10 py-3 lg:transition-colors lg:duration-300 min-w-max ${
-                            currentRoute === '/files'
-                                ? 'text-gray-900'
-                                : 'text-gray-400'
+                            currentRoute === '/files' ? 'text-gray-900' : 'text-gray-400'
                         } border-transparent rounded-l-sm hover:border-blue-600 hover:text-gray-900 border-l-4`}
                     >
                         <Link href="/files">
@@ -103,9 +90,7 @@ const Layout: FC_NoChildren<LayoutProps> = ({ children }) => {
                     </li>
                     <li
                         className={`px-10 py-3 transition-colors duration-300 min-w-max ${
-                            currentRoute === '/tasks'
-                                ? 'text-gray-900'
-                                : 'text-gray-400'
+                            currentRoute === '/tasks' ? 'text-gray-900' : 'text-gray-400'
                         } border-transparent rounded-l-sm hover:border-blue-600 hover:text-gray-900 border-l-4`}
                     >
                         <Link href="/tasks">
@@ -136,11 +121,13 @@ const Layout: FC_NoChildren<LayoutProps> = ({ children }) => {
                             setLanguage={setLocale}
                         />
                     </div> */}
+            <div ref={mainRef} className="absolute md:hidden w-screen h-screen left-0"></div>
             <main
-                ref={mainRef}
-                className={`px-7 overflow-auto relative flex-1 pt-16 filter md:filter-none ${
-                    menuOpened ? 'blur-sm bg-gray-200' : 'bg-gray-100'
-                }`}
+                className={`px-7 overflow-auto relative flex-1 pt-16 filter md:filter-none  ${
+                    menuOpened
+                        ? 'blur-sm bg-gray-200 pointer-events-none md:pointer-events-auto md:bg-gray-100'
+                        : 'bg-gray-100'
+                } `}
             >
                 {children(locale, user)}
             </main>

@@ -1,7 +1,5 @@
 import { ChevronUpIcon } from '@heroicons/react/outline'
-import { useState } from 'react'
 import { Disclosure } from '@headlessui/react'
-import FileIcon from './file-icon'
 import filesize from 'filesize'
 
 interface UploadFormFileProps {
@@ -24,17 +22,14 @@ const UploadFormFile: React.FC<UploadFormFileProps> = ({ file, canUpload }) => {
                     >
                         <span className="select-none">{file.name}</span>
                         <ChevronUpIcon
-                            className={`${
-                                open ? 'transform rotate-180' : ''
-                            } w-5 h-5 ${
+                            className={`${open ? 'transform rotate-180' : ''} w-5 h-5 ${
                                 canUpload ? 'text-blue-500' : 'text-red-500'
                             } `}
                         />
                     </Disclosure.Button>
                     <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
                         <p className="select-none">
-                            Размер: {filesize(file.size)}{' '}
-                            {canUpload ? '' : ' - превышает допустимый.'}
+                            Размер: {filesize(file.size)} {canUpload ? '' : ' - превышает допустимый.'}
                         </p>
                     </Disclosure.Panel>
                 </>

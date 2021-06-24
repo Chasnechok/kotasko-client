@@ -11,6 +11,8 @@ interface FilesListProps {
 }
 
 const FilesList: React.FC<FilesListProps> = ({ files, user }) => {
+    console.log(files)
+
     return (
         <Fragment>
             {!files.length && (

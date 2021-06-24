@@ -20,12 +20,12 @@ const FileComponent: React.FC<FileComponentProps> = ({ file, user }) => {
     const [isLoading, setIsLoading] = useState(false)
     const isOwner = file.owner._id === user._id
 
-    async function handleDelete() {
+    function handleDelete() {
         try {
-            await mutate(
+            $api.delete(`/files?fileId=${file._id}`)
+            mutate(
                 '/files/listForUser',
-                async (files: FileFetchResponse) => {
-                    await $api.delete(`/files?fileId=${file._id}`)
+                (files: FileFetchResponse) => {
                     const filteredFiles = files.owns.filter((f) => f._id !== file._id)
                     return {
                         owns: filteredFiles.sort((a, b) => {
@@ -55,13 +55,7 @@ const FileComponent: React.FC<FileComponentProps> = ({ file, user }) => {
         const a = new Date(file.createdAt)
         return a.toLocaleString()
     }
-    const handleDownload = async () => {
-        const { error } = await downloadFile(file)
-        if (error) {
-            mutate('/files/listForUser')
-            console.error(error)
-        }
-    }
+
     return (
         <div
             className={`w-full bg-white relative flex items-center overflow-hidden justify-between cursor-default my-3 py-5 px-5 lg:px-10 rounded-md shadow-md max-h-60 focus:outline-none sm:text-sm lg:hover:shadow-lg`}
@@ -86,7 +80,7 @@ const FileComponent: React.FC<FileComponentProps> = ({ file, user }) => {
             </div>
             <div className="flex items-center gap-x-4">
                 <div
-                    onClick={handleDownload}
+                    onClick={() => downloadFile(file)}
                     className={`${
                         deleteTriggered ? 'hidden' : 'block'
                     } md:p-2 group flex items-center hover:text-blue-600 cursor-pointer`}
