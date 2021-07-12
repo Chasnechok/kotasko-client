@@ -1,4 +1,4 @@
-import IFile, { FileDeleteResponse, FileFetchResponse } from '../../models/file'
+import IFile from '../../models/file'
 import { DownloadIcon, TrashIcon, ShareIcon } from '@heroicons/react/solid'
 import { Fragment, useState, useEffect } from 'react'
 import downloadFile from '../../http/download-file'
@@ -6,8 +6,8 @@ import filesize from 'filesize'
 import FileIcon from './file-icon'
 import ShareForm from './share-form'
 import IUser from '../../models/user'
-import { mutate } from 'swr'
-import $api from '../../http'
+import FilesService from '../../services/files.service'
+import { MUTATE_FILE_LIST as mutateList } from '../../pages/files'
 
 interface FileComponentProps {
     file: IFile
@@ -17,34 +17,17 @@ interface FileComponentProps {
 const FileComponent: React.FC<FileComponentProps> = ({ file, user }) => {
     const [shareFormOpened, setShareFormOpened] = useState(false)
     const [deleteTriggered, setDeleteTriggered] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
     const isOwner = file.owner._id === user._id
 
-    function handleDelete() {
-        try {
-            $api.delete(`/files?fileId=${file._id}`)
-            mutate(
-                '/files/listForUser',
-                (files: FileFetchResponse) => {
-                    const filteredFiles = files.owns.filter((f) => f._id !== file._id)
-                    return {
-                        owns: filteredFiles.sort((a, b) => {
-                            const d1 = new Date(a.createdAt)
-                            const d2 = new Date(b.createdAt)
-                            return d2.getTime() - d1.getTime()
-                        }),
-                        hasAccess: files.hasAccess,
-                    }
-                },
-                false
-            )
-        } catch (error) {}
+    async function handleDelete() {
+        await FilesService.deleteFile(file)
+        if (mutateList) mutateList()
     }
 
     useEffect(() => {
         let deleteT
         if (deleteTriggered) {
-            deleteT = setTimeout(handleDelete, 4500)
+            deleteT = setTimeout(handleDelete, 2500)
         }
         return () => {
             if (deleteT) clearTimeout(deleteT)
@@ -58,23 +41,27 @@ const FileComponent: React.FC<FileComponentProps> = ({ file, user }) => {
 
     return (
         <div
-            className={`w-full bg-white relative flex items-center overflow-hidden justify-between cursor-default my-3 py-5 px-5 lg:px-10 rounded-md shadow-md max-h-60 focus:outline-none sm:text-sm lg:hover:shadow-lg`}
+            className={`w-full ml-1 bg-white relative flex items-center overflow-hidden justify-between cursor-default my-3 py-5 px-5 lg:px-10 rounded-md shadow max-h-60 focus:outline-none sm:text-sm lg:hover:shadow-md`}
         >
             <div
                 className={`w-full ${
                     deleteTriggered ? 'animate-delete-bar' : 'hidden'
-                } left-0 absolute h-full bg-red-200`}
+                } left-0 absolute h-full bg-red-700 opacity-20`}
             ></div>
             <ShareForm user={user} formOpened={shareFormOpened} setFormOpened={setShareFormOpened} file={file} />
-            <div className="flex items-center gap-x-4 w-1/2 relative truncate md:w-max">
-                <div className="hidden relative md:block h-5 md:h-9 ">
+            <div className="relative w-1/2 md:w-max">
+                <div className="hidden absolute md:block left-0 top-1/2 -translate-y-1/2">
                     <FileIcon mimetype={file.mimetype} />
                 </div>
-                <div className="overflow-auto">
-                    <h1 className={`${deleteTriggered ? 'line-through' : ''} w-full text-sm md:text-base font-medium`}>
+                <div className="pl-0 md:pl-16 w-full overflow-x-auto">
+                    <h1
+                        className={`${
+                            deleteTriggered ? 'line-through' : ''
+                        } w-full break-all text-sm md:text-base font-medium`}
+                    >
                         {file.originalname}
                     </h1>
-                    <h2>Размер: {filesize(file.size)}</h2>
+                    <h2 className="">Размер: {filesize(file.size)}</h2>
                     <h2 className="hidden md:block">Загружено: {uploadedDate()}</h2>
                 </div>
             </div>

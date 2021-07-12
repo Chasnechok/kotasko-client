@@ -1,7 +1,8 @@
 import IUser from './user'
 
 export default interface IOrganisation {
+    _id: string
     name: string
-
-    head: IUser
+    address: string
+    head?: IUser
 }

@@ -14,10 +14,11 @@ module.exports = {
         },
         extend: {
             maxWidth: {
+                '3xs': '10rem',
                 '2xs': '15rem',
             },
             animation: {
-                'delete-bar': 'moveright 5s linear',
+                'delete-bar': 'moveright 2600ms linear',
             },
             keyframes: {
                 moveright: {
@@ -28,6 +29,7 @@ module.exports = {
     },
     variants: {
         extend: {},
+        scrollbar: ['rounded'],
     },
-    plugins: [require('@tailwindcss/typography'), require('@tailwindcss/forms')],
+    plugins: [require('@tailwindcss/typography'), require('@tailwindcss/forms'), require('tailwind-scrollbar')],
 }

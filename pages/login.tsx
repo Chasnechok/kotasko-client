@@ -9,6 +9,7 @@ import Lsi from '../lsi/login-page.lsi'
 import useLsi from '../hooks/useLsi'
 import formatReqCookies from '../http/cookie'
 import useSWR from 'swr'
+import axios from 'axios'
 
 export interface LoginPageProps {
     locale: string
@@ -21,24 +22,18 @@ const Login: FC = () => {
     const [locale, setLocale] = useLsi()
     const { error } = useSWR('/auth/checkSession')
     useEffect(() => {
-        console.log(error)
-
         if (!error) {
-            Router.replace('/files')
+            Router.push('/files', {})
         }
     }, [error])
-    async function handleLogin(
-        e: SyntheticEvent,
-        login: string,
-        password: string
-    ) {
+    async function handleLogin(e: SyntheticEvent, login: string, password: string) {
         try {
             e.preventDefault()
             setIsLoading(true)
             const delay = (ms) => new Promise((res) => setTimeout(res, ms))
             await delay(1000)
             await $api.post('/auth/login', { login, password })
-            Router.push('/files')
+            Router.push('/files', {})
         } catch (error) {
             const code = error?.response?.status
             setLoginError(Lsi[code] || Lsi[500])
@@ -55,16 +50,9 @@ const Login: FC = () => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <LoginDialog
-                isDialogOpen={isDialogOpen}
-                setIsDialogOpen={setIsDialogOpen}
-                language={locale}
-            />
+            <LoginDialog isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen} language={locale} />
             <div className="flex-grow max-w-md">
-                <ErrorBlock
-                    loginError={loginError?.[locale]}
-                    setLoginError={setLoginError}
-                />
+                <ErrorBlock loginError={loginError?.[locale]} setLoginError={setLoginError} />
                 <LoginForm
                     setIsDialogOpen={setIsDialogOpen}
                     isLoading={isLoading}
@@ -81,7 +69,7 @@ export default Login
 
 export async function getServerSideProps({ req }) {
     try {
-        await $api.get('/auth/checkSession', {
+        await axios.get('http://localhost:5000/auth/checkSession', {
             headers: {
                 Cookie: formatReqCookies(req),
             },

@@ -4,7 +4,7 @@ import Notification from './notification'
 import Bell from './bell'
 import { EyeIcon } from '@heroicons/react/solid'
 import { useEffect } from 'react'
-import { useNotifications } from '../../../hooks/useFetchCollection'
+import { useNotifications } from '../../../hooks/useNotifications'
 
 interface NotificationsProps {}
 
@@ -65,7 +65,7 @@ const Notifications: React.FC<NotificationsProps> = ({}) => {
                             leaveFrom="opacity-100 translate-y-0"
                             leaveTo="opacity-0 translate-y-1"
                         >
-                            <Popover.Panel className="absolute w-screen max-w-xs px-4 mt-3 transform -translate-x-1/2 md:-translate-x-full left-1/2 sm:px-0 lg:max-w-md">
+                            <Popover.Panel className="absolute w-screen max-w-sm px-4 mt-3 transform -translate-x-1/2 md:-translate-x-full left-1/2 sm:px-0 lg:max-w-md">
                                 <div className="overflow-hidden bg-white p-5 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                                     <h3 className="text-lg px-2 font-medium leading-6 text-gray-900 select-none">
                                         Ваши уведомления

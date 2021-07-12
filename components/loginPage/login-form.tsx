@@ -1,3 +1,4 @@
+import { UserCircleIcon, LockClosedIcon } from '@heroicons/react/outline'
 import { Dispatch, SetStateAction, SyntheticEvent } from 'react'
 import BarLoader from 'react-spinners/BarLoader'
 import useInput from '../../hooks/useInput'
@@ -9,11 +10,7 @@ import LanguageSelector from './language-selector'
 export interface LoginFormProps extends LsiComponent {
     setIsDialogOpen: Dispatch<SetStateAction<boolean>>
     isLoading: boolean
-    handleLogin: (
-        event: SyntheticEvent,
-        login: string,
-        password: string
-    ) => void
+    handleLogin: (event: SyntheticEvent, login: string, password: string) => void
     handleLanguageChange: () => void
 }
 
@@ -24,8 +21,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
     language,
     handleLanguageChange,
 }) => {
-    const [login, setLogin] = useInput<string>('nanoid')
-    const [password, setPassword] = useInput<string>('admin2')
+    const [login, setLogin] = useInput<string>('')
+    const [password, setPassword] = useInput<string>('')
 
     return (
         <form
@@ -33,34 +30,13 @@ const LoginForm: React.FC<LoginFormProps> = ({
             className="flex flex-nowrap gap-y-6 flex-col bg-white sm:rounded-md p-10 shadow-md relative"
         >
             <Logo />
-            <LanguageSelector
-                language={language}
-                onChange={handleLanguageChange}
-                classNames="absolute right-10"
-            />
+            <LanguageSelector language={language} onChange={handleLanguageChange} classNames="absolute right-10" />
             <div className="">
-                <h2 className="font-medium text-xl">
-                    {Lsi.greeting[language]}
-                </h2>
-                <h4 className="text-gray-500 text-sm">
-                    {Lsi.subGreeting[language]}
-                </h4>
+                <h2 className="font-medium text-xl">{Lsi.greeting[language]}</h2>
+                <h4 className="text-gray-500 text-sm">{Lsi.subGreeting[language]}</h4>
             </div>
             <div className="relative focus-within:text-blue-600">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-8 w-8 pl-3 absolute top-1/2 transform -translate-y-1/2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                </svg>
+                <UserCircleIcon className="h-8 w-8 pl-3 absolute top-1/2 -translate-y-1/2" />
                 <input
                     className="w-full rounded-md pl-12"
                     placeholder={Lsi.loginForm[language]}
@@ -73,20 +49,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             </div>
             <div>
                 <div className="relative focus-within:text-blue-600">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-8 w-8 pl-3 absolute top-1/2 transform -translate-y-1/2"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                        />
-                    </svg>
+                    <LockClosedIcon className="h-8 w-8 pl-3 absolute top-1/2 -translate-y-1/2" />
                     <input
                         className="rounded-md pl-12 w-full"
                         type="password"
@@ -108,9 +71,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                 <input
                     disabled={!password || !login}
                     className={`${
-                        isLoading
-                            ? 'cursor-default pointer-events-none'
-                            : 'cursor-pointer'
+                        isLoading ? 'cursor-default pointer-events-none' : 'cursor-pointer'
                     } w-full h-full border rounded-md bg-blue-600 hover:bg-blue-500 text-white disabled:cursor-default disabled:bg-gray-500
                             focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500`}
                     type="submit"

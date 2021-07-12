@@ -1,14 +1,9 @@
 import ITask from './task'
 import IUser from './user'
 
-export interface FileFetchResponse {
-    owns: IFile[]
-    hasAccess: IFile[]
-}
-
-export interface FileDeleteResponse {
-    success: IFile[]
-    failed: IFile[]
+export interface InputAttachments {
+    onServer: IFile[]
+    toUpload: File[]
 }
 
 export default interface IFile {

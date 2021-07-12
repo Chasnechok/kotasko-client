@@ -1,11 +1,20 @@
-import { useRef, Fragment, Dispatch, SetStateAction } from 'react'
+import { useRef, Fragment, Dispatch, SetStateAction, useEffect } from 'react'
 
 interface DragAreaProps {
     setFiles: Dispatch<SetStateAction<FileList>>
+    forceRerender: any
+    single?: boolean
 }
 
-const DragArea: React.FC<DragAreaProps> = ({ setFiles }) => {
+const DragArea: React.FC<DragAreaProps> = ({ setFiles, single, forceRerender }) => {
     const inputRef = useRef<HTMLInputElement>()
+
+    useEffect(() => {
+        if (!forceRerender) {
+            inputRef.current.value = ''
+        }
+    }, [forceRerender])
+
     function handleOnDrop() {
         setFiles(inputRef.current.files)
     }
@@ -18,12 +27,12 @@ const DragArea: React.FC<DragAreaProps> = ({ setFiles }) => {
                     name="fileDrop"
                     id="fileDrop"
                     ref={inputRef}
-                    multiple
+                    multiple={!single}
                     onInput={handleOnDrop}
                     onDrop={handleOnDrop}
                 />
                 <p className="absolute w-full text-center text-gray-400 pointer-events-none cursor-pointer group-focus-within:text-blue-900 group-hover:text-blue-900 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                    Загрузить файлы
+                    {single ? 'Загрузить файл' : 'Загрузить файлы'}
                 </p>
             </div>
         </Fragment>

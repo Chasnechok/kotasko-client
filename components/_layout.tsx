@@ -3,46 +3,59 @@ import Link from 'next/link'
 import $api from '../http'
 import { useRouter } from 'next/router'
 import useLsi from '../hooks/useLsi'
-import LanguageSelector from '../components/layout/language-selector'
+import LanguageSelector from './layout/language-selector'
 import Lsi from '../lsi/layout.lsi'
-import Logo from '../components/logo'
-import MenuIcon from '../components/layout/meni-icon'
+import Logo from './logo'
+import MenuIcon from './layout/meni-icon'
 import BarLoader from 'react-spinners/BarLoader'
-import { ClipboardCheckIcon, FolderDownloadIcon, CogIcon, LogoutIcon } from '@heroicons/react/outline'
-import { useNotifications, useUser } from '../hooks/useFetchCollection'
-import IUser from '../models/user'
-import Notifications from '../components/layout/notifications/notifications'
-import { useEffect } from 'react'
+import {
+    ClipboardCheckIcon,
+    FolderDownloadIcon,
+    CogIcon,
+    LogoutIcon,
+    DesktopComputerIcon,
+    ChipIcon,
+} from '@heroicons/react/outline'
+import { useUser } from '../hooks/useFetchCollection'
+import IUser, { UserRoleTypes, UserStatesTypes } from '../models/user'
+import Notifications from './layout/notifications/notifications'
+import FinishReg from './layout/finish-reg'
+import Head from 'next/head'
+import AlertsList from './alerts/alerts-list'
 
 type Renderable = ReactChild | Renderable[]
 
-type FC_NoChildren<P = {}> = { [K in keyof FC<P>]: FC<P>[K] } & {
+type FC_CustomChildren<P = {}> = { [K in keyof FC<P>]: FC<P>[K] } & {
     (props: P, context?: any): ReactElement | null
 }
 
 interface LayoutProps {
+    userFromSession?: IUser
     children: (language: string, user: IUser) => Renderable
 }
 
-const Layout: FC_NoChildren<LayoutProps> = ({ children }) => {
+const Layout: FC_CustomChildren<LayoutProps> = ({ children, userFromSession }) => {
     const Router = useRouter()
     const currentRoute = Router.route
     const [locale, setLocale] = useLsi()
     const [menuOpened, setMenuOpened] = useState(false)
-    const mainRef = useRef<HTMLDivElement>()
-    const closeMenu = useCallback(() => setMenuOpened(false), [setMenuOpened])
+    const overlayRef = useRef<HTMLDivElement>()
+    const closeMenu = useCallback(() => {
+        setMenuOpened(false)
+    }, [setMenuOpened])
 
     function handleMenu(state) {
-        const mainComponent = mainRef.current
-        if (state && mainComponent) {
-            mainComponent.addEventListener('click', closeMenu)
+        const overlay = overlayRef.current
+        if (state && overlay) {
+            overlay.addEventListener('click', closeMenu)
         }
-        if (!state && mainComponent) {
-            mainComponent.removeEventListener('click', closeMenu)
+        if (!state && overlay) {
+            overlay.removeEventListener('click', closeMenu)
         }
         setMenuOpened(state)
     }
-    const { user, loading } = useUser()
+    const { user, loading, mutate: mutateCurrUser } = useUser(userFromSession)
+
     async function logout() {
         try {
             await $api.get('auth/logout')
@@ -50,6 +63,16 @@ const Layout: FC_NoChildren<LayoutProps> = ({ children }) => {
         } catch (error) {
             console.log(error)
         }
+    }
+
+    function serviceAllowed(user: IUser) {
+        if (!user) return false
+        return user.department?.isServiceAllowed || user.roles.includes(UserRoleTypes.TECHNICIAN)
+    }
+
+    function isAdmin(user: IUser) {
+        if (!user || !user.roles) return false
+        return user.roles.includes(UserRoleTypes.ADMIN)
     }
 
     return (
@@ -100,9 +123,40 @@ const Layout: FC_NoChildren<LayoutProps> = ({ children }) => {
                             </a>
                         </Link>
                     </li>
+                    {serviceAllowed(user) && (
+                        <li
+                            className={`px-10 py-3 transition-colors duration-300 min-w-max ${
+                                currentRoute === '/chores' ? 'text-gray-900' : 'text-gray-400'
+                            } border-transparent rounded-l-sm hover:border-blue-600 hover:text-gray-900 border-l-4`}
+                        >
+                            <Link href="/chores">
+                                <a className="flex items-center gap-x-2">
+                                    <DesktopComputerIcon className="h-6 w-6" />
+                                    {Lsi.choresLink[locale]}
+                                </a>
+                            </Link>
+                        </li>
+                    )}
+                    {isAdmin(user) && (
+                        <li
+                            className={`px-10 py-3 transition-colors duration-300 min-w-max ${
+                                currentRoute === '/admin' ? 'text-gray-900' : 'text-gray-400'
+                            } border-transparent rounded-l-sm hover:border-blue-600 hover:text-gray-900 border-l-4`}
+                        >
+                            <Link href="/admin">
+                                <a className="flex items-center gap-x-2">
+                                    <ChipIcon className="h-6 w-6" />
+                                    {Lsi.adminLink[locale]}
+                                </a>
+                            </Link>
+                        </li>
+                    )}
                 </ul>
                 <ul>
-                    <li className="flex text-gray-400 py-3 cursor-pointer gap-x-2 px-10 border-transparent rounded-l-sm hover:border-blue-600 hover:text-gray-900 border-l-4">
+                    <li
+                        onClick={() => alert('В разработке')}
+                        className="flex text-gray-400 py-3 cursor-pointer gap-x-2 px-10 border-transparent rounded-l-sm hover:border-blue-600 hover:text-gray-900 border-l-4"
+                    >
                         <CogIcon className="w-6 h-6" />
                         {Lsi.settingsLink[locale]}
                     </li>
@@ -121,15 +175,31 @@ const Layout: FC_NoChildren<LayoutProps> = ({ children }) => {
                             setLanguage={setLocale}
                         />
                     </div> */}
-            <div ref={mainRef} className="absolute md:hidden w-screen h-screen left-0"></div>
+            {user && user.state == UserStatesTypes.CREATED && (
+                <Fragment>
+                    <Head>
+                        <title>Kotasko | Регистрация</title>
+                        <link rel="icon" href="/favicon.ico" />
+                    </Head>
+                    <FinishReg
+                        mutateCurrUser={mutateCurrUser}
+                        formOpened={true}
+                        setFormOpened={() => null}
+                        targetUser={user}
+                    />
+                </Fragment>
+            )}
+
+            <div ref={overlayRef} className="absolute md:hidden w-screen h-screen left-0"></div>
+            <AlertsList />
             <main
-                className={`px-7 overflow-auto relative flex-1 pt-16 filter md:filter-none  ${
+                className={`md:px-7 overflow-auto relative flex-1 pt-16 filter md:filter-none  ${
                     menuOpened
                         ? 'blur-sm bg-gray-200 pointer-events-none md:pointer-events-auto md:bg-gray-100'
                         : 'bg-gray-100'
                 } `}
             >
-                {children(locale, user)}
+                {user && user.state === UserStatesTypes.ACTIVE && children(locale, user)}
             </main>
         </Fragment>
     )
