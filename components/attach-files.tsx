@@ -127,7 +127,7 @@ const AttachFiles: React.FC<AttachFilesProps> = ({ single, initial, setInputAtta
                         fetchUrl="/files/list"
                     >
                         {(file) => {
-                            // Workaround. Reason: useSWRInfinite doesn't support global mutate yet
+                            if (!file) return null
                             return (
                                 <SwitchGroup
                                     checked={isLinked(file)}
