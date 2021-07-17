@@ -18,7 +18,7 @@ import {
 } from '@heroicons/react/outline'
 import { useUser } from '../hooks/useFetchCollection'
 import IUser, { UserRoleTypes, UserStatesTypes } from '../models/user'
-import Notifications from './layout/notifications/notifications'
+import Notifications from './notifications'
 import FinishReg from './layout/finish-reg'
 import Head from 'next/head'
 import AlertsList from './alerts/alerts-list'

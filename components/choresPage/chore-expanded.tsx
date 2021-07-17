@@ -23,7 +23,8 @@ const ChoreExpanded: React.FC<ChoreExpandedProps> = ({ choreId, user }) => {
 
     function clearQuery() {
         if (router.query.choreId) {
-            router.replace(router.pathname, {}, { shallow: true })
+            delete router.query.choreId
+            router.push({ pathname: router.pathname, query: router.query }, {}, { shallow: true })
         }
     }
 

@@ -1,8 +1,4 @@
 import ITask, { TaskStates } from '../../models/task'
-import Image from 'next/image'
-import TaskCreated from '../../public/icons/tasks/task-created.svg'
-import TaskPendingReview from '../../public/icons/tasks/task-pending-review.svg'
-import TaskCompleted from '../../public/icons/tasks/task-completed.svg'
 import Link from 'next/link'
 import SimpleSpinner from '../simple-spinner'
 import { useState, Fragment } from 'react'
@@ -102,7 +98,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
                 setOpened={setDeleteTriggered}
                 description={`Вы собираетесь удалить "${task.name}"`}
             />
-            <Link replace href={`/tasks?taskId=${task._id}`}>
+            <Link replace href={`/tasks?shared=${router.query.shared === 'true'}&taskId=${task._id}`}>
                 <a
                     className={`mx-2 my-6 lg:my-4 shadow hover:shadow-md relative rounded-lg p-5 block focus-visible:outline-none focus-visible:ring-2 ring-offset-blue-300 ring-offset-2 ring-white
                 ${isSelected ? 'bg-gradient-to-l from-blue-50 to-white' : 'bg-white'}

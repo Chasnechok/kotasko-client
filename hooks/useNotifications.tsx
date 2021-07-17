@@ -1,111 +1,115 @@
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-import useSWR, { mutate } from 'swr'
+import { useEffect, useRef, useState } from 'react'
+import { Socket, io } from 'socket.io-client'
 import { API_URL } from '../http'
 import INotification, { NotificationsTypes } from '../models/notification'
-import { MUTATE_CHORE_LIST } from '../pages/chores'
-import { MUTATE_FILE_LIST } from '../pages/files'
-import { MUTATE_TASK_LIST } from '../pages/tasks'
+import { MUTATE_CHORE_LIST as mutateChores } from '../pages/chores'
+import { MUTATE_FILE_LIST as mutateFiles } from '../pages/files'
+import { MUTATE_TASK_LIST as mutateTasks } from '../pages/tasks'
 import NotificationsService from '../services/notifications.service'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+    getNotifications,
+    setNotifications,
+    addNotification,
+    removeNotification,
+} from '../components/notifications/notifications.slice'
 
 export function useNotifications() {
-    const {
-        data,
-        mutate: setNotifications,
-        error,
-    } = useSWR('/notifications/list', {
-        revalidateOnFocus: false,
-    })
-    const notifications: INotification[] = data
-    const loading = !data && !error
-    const loggedOut = error && [401, 403].includes(error.status || error.response?.status)
+    const [loading, setLoading] = useState(true)
+    const notifications = useSelector(getNotifications)
+    const dispatch = useDispatch()
+    const socket = useRef<Socket>()
     const router = useRouter()
-
     useEffect(() => {
-        const notificationsSource = new EventSource(API_URL + '/notifications', {
+        setLoading(true)
+        socket.current = io(API_URL + '/notifications', {
             withCredentials: true,
+            transports: ['websocket'],
         })
-
-        notificationsSource.onmessage = function (event) {
-            const notification: INotification = JSON.parse(event.data)
-            switch (notification.type) {
-                case NotificationsTypes.FILE_UNSHARED:
+        socket.current.emit('list')
+        socket.current.on('list', (data) => {
+            dispatch(setNotifications(data))
+            setLoading(false)
+        })
+        socket.current.on('notification', (nf: INotification) => {
+            const onFilesPage = document.location.pathname == '/files'
+            const onTasksPage = document.location.pathname == '/tasks'
+            const onChoresPage = document.location.pathname == '/chores'
+            const taskShared = onTasksPage && document.location.search.includes('shared=true')
+            const choresActive = onTasksPage && document.location.search.includes('active=true')
+            switch (nf.type) {
                 case NotificationsTypes.NEW_SHARED_FILE:
-                    const onFilesPage = router.route === '/files'
-                    setNotifications()
-                    if (MUTATE_FILE_LIST && onFilesPage) MUTATE_FILE_LIST()
+                    if (onFilesPage && mutateFiles) mutateFiles()
+                    dispatch(addNotification(nf))
+                    break
+                case NotificationsTypes.FILE_UNSHARED:
+                    if (onFilesPage && mutateFiles) mutateFiles()
+                    socket.current.emit('list')
                     break
                 case NotificationsTypes.NEW_TASK:
-                case NotificationsTypes.UPDATE_TASK:
-                    const onTasksPage = router.route === '/tasks'
-                    if (onTasksPage && MUTATE_TASK_LIST) {
-                        MUTATE_TASK_LIST()
-                    }
-                    setNotifications()
+                    if (onTasksPage && mutateTasks) mutateTasks()
+                    dispatch(addNotification(nf))
                     break
-                case NotificationsTypes.NEW_TASK_MESSAGE: {
-                    const onTasksPage = router.route === '/tasks'
-                    if (!onTasksPage) {
-                        setNotifications()
-                    } else NotificationsService.remove(notification)
-                }
+                case NotificationsTypes.TASK_REMOVED:
                 case NotificationsTypes.TASK_UNASSIGNED:
-                case NotificationsTypes.TASK_REMOVED: {
-                    const onTasksPage = router.route === '/tasks'
-                    if (onTasksPage && MUTATE_TASK_LIST) {
-                        MUTATE_TASK_LIST()
+                    if (onTasksPage && mutateTasks) {
+                        if (document.location.search.includes(nf.referencedTask?._id)) {
+                            router.push(`/tasks?shared=${taskShared}`, null, { shallow: true })
+                        }
+                        mutateTasks()
                     }
-                    setNotifications()
+                    dispatch(removeNotification(nf))
                     break
-                }
+                case NotificationsTypes.UPDATE_TASK:
+                case NotificationsTypes.COMPLETE_TASK:
+                    if (onTasksPage && mutateTasks) mutateTasks()
+                    if (onTasksPage && document.location.search.includes(nf.referencedTask?._id)) {
+                        NotificationsService.remove(nf)
+                    } else dispatch(addNotification(Object.assign(nf, { filterBy: 'referencedTask' })))
 
-                case NotificationsTypes.NEW_CHORE_MESSAGE: {
-                    const onChoresPage = router.route === '/chores'
-                    if (!onChoresPage) {
-                        setNotifications()
-                    } else NotificationsService.remove(notification)
                     break
-                }
-                case NotificationsTypes.NEW_CHORE: {
-                    const userOnPage = router.pathname === '/chores'
-                    setNotifications((notifications: INotification[]) => {
-                        if (!notifications) return [notification]
-                        return [
-                            notification,
-                            ...notifications.filter((nf) =>
-                                nf.referencedChore ? nf.referencedChore._id !== notification.referencedChore._id : true
-                            ),
-                        ]
-                    }, false)
-                    if (userOnPage && MUTATE_CHORE_LIST) {
-                        MUTATE_CHORE_LIST()
-                    }
+                case NotificationsTypes.NEW_TASK_MESSAGE:
+                    if (onTasksPage && document.location.search.includes(nf.referencedTask?._id)) {
+                        NotificationsService.remove(nf)
+                    } else dispatch(addNotification(Object.assign(nf, { filterBy: 'referencedTask' })))
                     break
-                }
-                case NotificationsTypes.CHORE_UPDATED:
+                case NotificationsTypes.NEW_CHORE:
+                    if (onChoresPage && mutateChores) mutateChores()
+                    dispatch(addNotification(nf))
+                    break
                 case NotificationsTypes.CHORE_SOLVED:
-                case NotificationsTypes.CHORE_REMOVED: {
-                    const userOnPage = router.pathname === '/chores'
-                    if (userOnPage && MUTATE_CHORE_LIST) {
-                        MUTATE_CHORE_LIST()
-                    }
-                    setNotifications()
+                case NotificationsTypes.CHORE_UPDATED:
+                    if (onChoresPage && mutateChores) mutateChores()
+                    if (onChoresPage && document.location.search.includes(nf.referencedChore?._id)) {
+                        NotificationsService.remove(nf)
+                    } else dispatch(addNotification(Object.assign(nf, { filterBy: 'referencedChore' })))
                     break
-                }
+                case NotificationsTypes.CHORE_REMOVED:
+                    if (onChoresPage && mutateChores) {
+                        if (document.location.search.includes(nf.referencedChore?._id)) {
+                            router.push(`/chores?active=${choresActive}`, null, { shallow: true })
+                        }
+                        mutateChores()
+                    }
+                    dispatch(removeNotification(nf))
+                    break
+                case NotificationsTypes.NEW_CHORE_MESSAGE:
+                    if (onChoresPage && document.location.search.includes(nf.referencedChore?._id)) {
+                        NotificationsService.remove(nf)
+                    } else dispatch(addNotification(Object.assign(nf, { filterBy: 'referencedChore' })))
+                    break
+                default:
+                    console.log(nf)
             }
+        })
+        return () => {
+            socket.current.close()
         }
-        if (loggedOut) {
-            router.replace('/login')
-        }
-        return function cleanup() {
-            notificationsSource.close()
-        }
-    }, [loggedOut])
+    }, [])
 
     return {
         loading,
-        error,
         notifications,
-        setNotifications,
     }
 }

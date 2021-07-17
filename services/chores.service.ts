@@ -1,9 +1,12 @@
+import router from 'next/router'
 import $api from '../http'
 import IChore, { ChoreStates, ChoreTypes } from '../models/chore'
 import { MessagesTypes } from '../models/message'
 import { AlertsService } from './alerts.service'
 import MessagesService from './messages.service'
 import UsersService from './users.service'
+import { store } from '../redux.store'
+import { removeByChore } from '../components/notifications/notifications.slice'
 
 export default class ChoresService {
     static async createChore(details: string) {
@@ -77,6 +80,10 @@ export default class ChoresService {
     static async deleteChore(chore: IChore) {
         try {
             await $api.delete<IChore>(`/chores?choreId=${chore._id}`)
+            if (document.location.search.includes(chore._id)) {
+                router.replace('/chores', null, { shallow: true })
+            }
+            store.dispatch(removeByChore(chore))
             AlertsService.addAlert({ content: 'Запрос удален' })
         } catch (error) {
             AlertsService.alertFromError(error)

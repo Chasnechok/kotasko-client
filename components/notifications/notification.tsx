@@ -1,33 +1,28 @@
-import { useState, useEffect } from 'react'
-import INotification, { NotificationsTypes } from '../../../models/notification'
+import { useState, useEffect, SetStateAction, Dispatch } from 'react'
+import INotification, { NotificationsTypes } from '../../models/notification'
 import { ChevronUpIcon, DownloadIcon, EyeIcon } from '@heroicons/react/outline'
 import { Disclosure } from '@headlessui/react'
-import IUser from '../../../models/user'
+import IUser from '../../models/user'
 import filesize from 'filesize'
-import downloadFile from '../../../http/download-file'
+import downloadFile from '../../http/download-file'
 import Link from 'next/link'
-import NotificationsService from '../../../services/notifications.service'
+import NotificationsService from '../../services/notifications.service'
+import { useDispatch } from 'react-redux'
+import { setSeen } from './notifications.slice'
 
 interface NotificationProps {
     notification: INotification
-    setNotifications: (data?: any, shouldRevalidate?: boolean) => Promise<any>
 }
 
-const Notification: React.FC<NotificationProps> = ({ notification, setNotifications }) => {
+const Notification: React.FC<NotificationProps> = ({ notification }) => {
     const [opened, setOpened] = useState(false)
+    const dispatch = useDispatch()
     useEffect(() => {
         let timer
         if (!notification.isSeen && opened) {
             timer = setTimeout(async () => {
                 NotificationsService.setSeen(notification)
-                setNotifications((nfs: INotification[]) => {
-                    if (!nfs) return
-                    const r = nfs.map((nf) => ({
-                        ...nf,
-                        isSeen: nf._id === notification._id || nf.isSeen,
-                    }))
-                    return r
-                }, false)
+                dispatch(setSeen(notification))
             }, 200)
         }
         return () => {
@@ -76,7 +71,7 @@ const Notification: React.FC<NotificationProps> = ({ notification, setNotificati
         const referencedTask = notification.referencedTask
         if (!referencedTask) return null
         return (
-            <Link href={`/tasks?taskId=${referencedTask._id}`}>
+            <Link href={`/tasks?shared=true&taskId=${referencedTask._id}`}>
                 <p className="underline cursor-pointer max-w-full truncate">Задание: {referencedTask.name}</p>
             </Link>
         )

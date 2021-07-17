@@ -1,42 +1,32 @@
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-import useSWR from 'swr'
+import { useEffect, useRef, useState } from 'react'
 import { API_URL } from '../http'
 import { IMessage } from '../models/message'
+import { io, Socket } from 'socket.io-client'
 
-export function useMessageBus(initialUrl: string, busId: string) {
-    const {
-        data,
-        mutate: setMessages,
-        error,
-    } = useSWR<IMessage[]>(initialUrl, {
-        revalidateOnFocus: false,
-    })
-    const loading = !data && !error
-    const loggedOut = error && [401, 403].includes(error.status || error.response?.status)
-    const router = useRouter()
+export function useMessageBus(busId: string) {
+    const [loading, setLoading] = useState(true)
+    const [messages, setMessages] = useState<IMessage[]>()
+    const socket = useRef<Socket>()
 
     useEffect(() => {
-        const messageBus = new EventSource(API_URL + `/messages/subscribe?busId=${busId}`, {
+        setLoading(true)
+        setMessages([])
+        socket.current = io(API_URL + '/chat', {
             withCredentials: true,
+            transports: ['websocket'],
         })
-        messageBus.onmessage = function (event) {
-            const message: IMessage = JSON.parse(event.data)
-            setMessages((msgs) => {
-                if (!msgs) return [message]
-                return [...msgs, message]
-            }, false)
+        socket.current.emit('list', { entityId: busId })
+        socket.current.on('list', (data) => {
+            setMessages(data)
+            setLoading(false)
+        })
+        socket.current.on('message', (data) => {
+            setMessages((msgs) => [...msgs, data])
+        })
+        return () => {
+            socket.current.close()
         }
-        if (loggedOut) {
-            router.replace('/login')
-        }
-        return () => messageBus.close()
-    }, [loggedOut, busId])
+    }, [busId])
 
-    return {
-        loading,
-        error,
-        data,
-        setMessages,
-    }
+    return { loading, messages }
 }

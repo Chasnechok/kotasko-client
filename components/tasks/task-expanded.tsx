@@ -22,7 +22,8 @@ const TaskExpanded: React.FC<ChoreExpandedProps> = ({ taskId, user }) => {
 
     function clearQuery() {
         if (router.query.taskId) {
-            router.replace(router.pathname, {}, { shallow: true })
+            delete router.query.taskId
+            router.push({ pathname: router.pathname, query: router.query }, {}, { shallow: true })
         }
     }
 
@@ -38,7 +39,7 @@ const TaskExpanded: React.FC<ChoreExpandedProps> = ({ taskId, user }) => {
                     currUser={user}
                     attachments="single"
                     messageType={MessagesTypes.INTASK_MESSAGE}
-                    fetchUrl={`/messages/listForTask?taskId=${taskId}`}
+                    fetchUrl={'/messages/listForTask'}
                     busId={taskId}
                 />
             </div>

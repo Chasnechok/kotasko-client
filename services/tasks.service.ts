@@ -1,3 +1,4 @@
+import router from 'next/router'
 import $api from '../http'
 import { InputAttachments } from '../models/file'
 import { MessagesTypes } from '../models/message'
@@ -6,6 +7,8 @@ import IUser from '../models/user'
 import { AlertsService } from './alerts.service'
 import FilesService from './files.service'
 import MessagesService from './messages.service'
+import { store } from '../redux.store'
+import { removeByTask } from '../components/notifications/notifications.slice'
 
 export default class TasksService {
     static async createTask(name: string, details: string, assignedTo: IUser[], attachments: InputAttachments) {
@@ -63,6 +66,10 @@ export default class TasksService {
     static async deleteTask(task: ITask) {
         try {
             await $api.delete<ITask>(`/tasks?taskId=${task._id}`)
+            if (document.location.search.includes(task._id)) {
+                router.replace('/tasks', null, { shallow: true })
+            }
+            store.dispatch(removeByTask(task))
             AlertsService.addAlert({ content: 'Задание удалено' })
         } catch (error) {
             AlertsService.alertFromError(error)

@@ -23,10 +23,13 @@ interface TasksPageProps {
 
 const TasksPage: React.FC<TasksPageProps> = ({ userFromSession }) => {
     const [createFormOpened, setCreateFormOpened] = useState(false)
-    const [showShared, setShowShared] = useState(false)
     const router = useRouter()
+    const showShared = router.query.shared == 'true'
+    function setShowShared(v: boolean) {
+        router.query.shared = v.toString()
+        router.push({ pathname: router.pathname, query: router.query }, null, { shallow: true })
+    }
     const selectedId = router.query.taskId
-
     const options = [
         {
             label: 'Созданные вами',

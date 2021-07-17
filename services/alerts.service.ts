@@ -1,5 +1,5 @@
 import IAlert from '../components/alerts/alert.type'
-import { addAlert, removeAlert } from '../components/alerts/alerts-slice'
+import { addAlert, removeAlert } from '../components/alerts/alerts.slice'
 import { store } from '../redux.store'
 import { AxiosError } from 'axios'
 

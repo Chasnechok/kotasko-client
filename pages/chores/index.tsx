@@ -24,7 +24,11 @@ interface ChoresPageProps {
 const ChoresPage: React.FC<ChoresPageProps> = ({ userFromSession }) => {
     const router = useRouter()
     const [createFormOpened, setCreateFormOpened] = useState(false)
-    const [showActive, setShowActive] = useState(true)
+    const showActive = router.query.active == 'true' || !router.query.active
+    function setShowActive(v: boolean) {
+        router.query.active = v.toString()
+        router.push({ pathname: router.pathname, query: router.query }, null, { shallow: true })
+    }
     const selectedId = router.query.choreId
 
     function shouldRender(chore: IChore) {

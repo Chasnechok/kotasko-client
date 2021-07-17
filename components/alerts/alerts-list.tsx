@@ -1,4 +1,4 @@
-import { getAlerts } from './alerts-slice'
+import { getAlerts } from './alerts.slice'
 import { useSelector } from 'react-redux'
 import AlertComponent from './alert-component'
 

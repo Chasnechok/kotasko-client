@@ -20,13 +20,13 @@ interface ChatProps {
 
 const Chat: React.FC<ChatProps> = ({ fetchUrl, busId, currUser, attachments, className, messageType }) => {
     const listRef = useRef<HTMLDivElement>()
-    const { data: messages, loading } = useMessageBus(fetchUrl, busId)
+    const { messages, loading } = useMessageBus(busId)
 
     useEffect(() => {
         if (listRef.current) {
             listRef.current.scrollTo(0, listRef.current.scrollHeight)
         }
-    }, [messages])
+    }, [messages, loading])
 
     async function onMessageInput(messageContent: string, attachments: InputAttachments) {
         await MessagesService.sendMessage(messageContent, messageType, attachments, busId)
@@ -36,7 +36,6 @@ const Chat: React.FC<ChatProps> = ({ fetchUrl, busId, currUser, attachments, cla
         <div className={`h-full flex flex-col rounded-md overflow-hidden ${className}`}>
             <div
                 ref={listRef}
-                style={{ scrollBehavior: 'smooth' }}
                 className="bg-gray-100 flex-1 flex py-4 h-full overflow-y-scroll rounded-md flex-col justify-end shadow-inner "
                 id="chat"
             >
