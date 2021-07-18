@@ -130,7 +130,7 @@ const ChoreComponent: React.FC<ChoreComponentProps> = ({ chore, currUser, mutate
                     </button>
                 </div>
             </DialogModal>
-            <Link href={`/chores?active=${router.query.active == 'true'}&choreId=${chore._id}`}>
+            <Link href={`/chores?active=${router.query.active == 'true' || !router.query.active}&choreId=${chore._id}`}>
                 <a
                     className={`mx-2 my-4 shadow hover:shadow-md relative rounded-lg p-5 block focus-visible:outline-none focus-visible:ring-2 ring-offset-blue-300 ring-offset-2 ring-white
                 ${isSelected ? 'bg-gradient-to-l from-blue-50 to-white' : 'bg-white'}

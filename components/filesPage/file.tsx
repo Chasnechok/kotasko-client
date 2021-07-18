@@ -8,6 +8,7 @@ import ShareForm from './share-form'
 import IUser from '../../models/user'
 import FilesService from '../../services/files.service'
 import { MUTATE_FILE_LIST as mutateList } from '../../pages/files'
+import UsersService from '../../services/users.service'
 
 interface FileComponentProps {
     file: IFile
@@ -61,8 +62,13 @@ const FileComponent: React.FC<FileComponentProps> = ({ file, user }) => {
                     >
                         {file.originalname}
                     </h1>
-                    <h2 className="">Размер: {filesize(file.size)}</h2>
+                    <h2 className="text-xs md:text-sm lg:text-base">Размер: {filesize(file.size)}</h2>
                     <h2 className="hidden md:block">Загружено: {uploadedDate()}</h2>
+                    {user._id !== file.owner?._id && (
+                        <h2 className="text-xs md:text-sm lg:text-base">
+                            Поделился: {UsersService.formatName(file.owner)}
+                        </h2>
+                    )}
                 </div>
             </div>
             <div className="flex items-center gap-x-4">
