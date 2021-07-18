@@ -15,22 +15,23 @@ export function addNotification(nf: INotification, filterBy?: SupportedEntities)
         return mutate(
             '/notifications',
             (nfs) => {
+                if (!nfs) return [nf]
                 const filtered = nfs.filter((n) => (n[filterBy] ? n[filterBy]._id !== nf[filterBy]._id : true))
                 return [nf, ...filtered]
             },
             false
         )
     }
-    return mutate('/notifications', (nfs) => [nf, ...nfs], false)
+    return mutate('/notifications', (nfs) => (nfs ? [nf, ...nfs] : [nf]), false)
 }
 export function removeNotification(nf: INotification) {
-    return mutate('/notifications', (nfs) => nfs.filter((n) => n._id !== nf._id), false)
+    return mutate('/notifications', (nfs) => (nfs ? nfs.filter((n) => n._id !== nf._id) : nfs), false)
 }
 
 export function removeNotificationByEntity<T extends { _id: string }>(filterBy: SupportedEntities, entity: T) {
     return mutate(
         '/notifications',
-        (nfs) => nfs.filter((n) => (n[filterBy] ? n[filterBy]._id !== entity._id : true)),
+        (nfs) => (nfs ? nfs.filter((n) => (n[filterBy] ? n[filterBy]._id !== entity._id : true)) : nfs),
         false
     )
 }
@@ -73,6 +74,7 @@ export function useNotifications() {
                     break
                 case NotificationsTypes.FILE_UNSHARED:
                     if (onFilesPage && mutateFiles) mutateFiles()
+                    removeNotificationByEntity('referencedFile', nf.referencedFile)
                     socket.current.emit('list')
                     break
                 case NotificationsTypes.NEW_TASK:
@@ -87,7 +89,7 @@ export function useNotifications() {
                         }
                         mutateTasks()
                     }
-                    removeNotification(nf)
+                    removeNotificationByEntity('referencedTask', nf.referencedTask)
                     break
                 case NotificationsTypes.UPDATE_TASK:
                 case NotificationsTypes.COMPLETE_TASK:
@@ -120,7 +122,7 @@ export function useNotifications() {
                         }
                         mutateChores()
                     }
-                    removeNotification(nf)
+                    removeNotificationByEntity('referencedChore', nf.referencedChore)
                     break
                 case NotificationsTypes.NEW_CHORE_MESSAGE:
                     if (onChoresPage && document.location.search.includes(nf.referencedChore?._id)) {

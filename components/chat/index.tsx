@@ -7,6 +7,7 @@ import { MessagesTypes } from '../../models/message'
 import { useMessageBus } from '../../hooks/useMessageBus'
 import { InputAttachments } from '../../models/file'
 import MessagesService from '../../services/messages.service'
+import NotificationsService from '../../services/notifications.service'
 
 interface ChatProps {
     currUser: IUser
@@ -26,6 +27,12 @@ const Chat: React.FC<ChatProps> = ({ busId, currUser, attachments, className, me
             listRef.current.scrollTo(0, listRef.current.scrollHeight)
         }
     }, [messages, loading])
+
+    useEffect(() => {
+        if (busId) {
+            NotificationsService.setSeenByEntity(busId)
+        }
+    }, [busId])
 
     async function onMessageInput(messageContent: string, attachments: InputAttachments) {
         await MessagesService.sendMessage(messageContent, messageType, attachments, busId)

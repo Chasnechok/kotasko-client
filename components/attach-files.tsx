@@ -15,8 +15,6 @@ interface AttachFilesProps {
     userFromSession: IUser
 }
 
-const ALLOWED_SIZE = 5e7
-
 const AttachFiles: React.FC<AttachFilesProps> = ({ single, initial, setInputAttachments, userFromSession }) => {
     const [uploadedFiles, setUploadedFiles] = useState<FileList>()
     const [error, setError] = useState('')
@@ -24,8 +22,12 @@ const AttachFiles: React.FC<AttachFilesProps> = ({ single, initial, setInputAtta
         if (!uploadedFiles || !uploadedFiles.length) return
         if (error) setError('')
         const candidates = Array.from(uploadedFiles)
-        if (candidates.some((f) => f.size > ALLOWED_SIZE)) {
-            setError('Файл слишком большой')
+        if (
+            candidates.some(
+                (f) => f.size + userFromSession.spaceUsed > userFromSession.quota && userFromSession.quota !== -1
+            )
+        ) {
+            setError('Файл(ы) превысят вашу квоту ' + filesize(userFromSession.quota))
             return
         }
         setInputAttachments((v) => ({
@@ -37,7 +39,7 @@ const AttachFiles: React.FC<AttachFilesProps> = ({ single, initial, setInputAtta
     useEffect(() => {
         let timer
         if (error) {
-            timer = setTimeout(() => setError(''), 2000)
+            timer = setTimeout(() => setError(''), 2500)
         }
         return () => {
             if (timer) clearTimeout(timer)

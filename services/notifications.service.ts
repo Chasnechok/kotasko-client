@@ -1,3 +1,4 @@
+import { mutate } from 'swr'
 import { setSeen } from '../hooks/useNotifications'
 import $api from '../http'
 import INotification, { NotificationsTypes } from '../models/notification'
@@ -14,6 +15,28 @@ export default class NotificationsService {
         } catch (error) {
             AlertsService.alertFromError(error)
         }
+    }
+
+    static async setSeenByEntity(entityId: string) {
+        mutate(
+            '/notifications',
+            (nfs: INotification[]) => {
+                if (!nfs) return
+                const r = nfs.map((nf) => {
+                    if (nf.referencedChore && nf.referencedChore._id == entityId && !nf.isSeen) {
+                        this.setSeen(nf)
+                        return { ...nf, isSeen: true }
+                    }
+                    if (nf.referencedTask && nf.referencedTask._id == entityId && !nf.isSeen) {
+                        this.setSeen(nf)
+                        return { ...nf, isSeen: true }
+                    }
+                    return nf
+                })
+                return r
+            },
+            false
+        )
     }
 
     static async remove(notification: INotification) {
