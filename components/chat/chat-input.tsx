@@ -32,7 +32,6 @@ const ChatInput: React.FC<ChatInputProps> = ({ onMessageInput, attachments, curr
         if (e.key === 'Enter' && !e.ctrlKey) {
             e.preventDefault()
             handleSendMessage()
-            setInputAttachments(null)
         }
         if (e.key === 'Enter' && e.ctrlKey) {
             setMessage((m) => m + '\n')
@@ -44,6 +43,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onMessageInput, attachments, curr
             if (!message) return
             setLoading(true)
             await onMessageInput(message, inputAttachments)
+            setInputAttachments(null)
             setMessage('')
         } catch (error) {
             console.log(error)
