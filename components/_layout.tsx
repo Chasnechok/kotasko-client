@@ -35,8 +35,8 @@ interface LayoutProps {
 }
 
 const Layout: FC_CustomChildren<LayoutProps> = ({ children, userFromSession }) => {
-    const Router = useRouter()
-    const currentRoute = Router.route
+    const router = useRouter()
+    const currentRoute = router.route
     const [locale, setLocale] = useLsi()
     const [menuOpened, setMenuOpened] = useState(false)
     const overlayRef = useRef<HTMLDivElement>()
@@ -59,7 +59,7 @@ const Layout: FC_CustomChildren<LayoutProps> = ({ children, userFromSession }) =
     async function logout() {
         try {
             await $api.get('auth/logout')
-            Router.replace('/login')
+            router.replace('/login')
         } catch (error) {
             console.log(error)
         }
@@ -82,7 +82,7 @@ const Layout: FC_CustomChildren<LayoutProps> = ({ children, userFromSession }) =
 
                 <div className="flex gap-x-4 relative items-center">
                     {loading && <BarLoader />}
-                    <Notifications />
+                    <Notifications currUser={user} />
 
                     {user && (
                         <span className="cursor-default hidden md:inline">

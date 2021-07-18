@@ -10,9 +10,10 @@ import NotificationsService from '../../services/notifications.service'
 
 interface NotificationProps {
     notification: INotification
+    currUser: IUser
 }
 
-const Notification: React.FC<NotificationProps> = ({ notification }) => {
+const Notification: React.FC<NotificationProps> = ({ notification, currUser }) => {
     const [opened, setOpened] = useState(false)
     useEffect(() => {
         let timer
@@ -67,7 +68,7 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
         const referencedTask = notification.referencedTask
         if (!referencedTask) return null
         return (
-            <Link href={`/tasks?shared=true&taskId=${referencedTask._id}`}>
+            <Link href={`/tasks?shared=${referencedTask.creator?._id !== currUser._id}&taskId=${referencedTask._id}`}>
                 <p className="underline cursor-pointer max-w-full truncate">Задание: {referencedTask.name}</p>
             </Link>
         )

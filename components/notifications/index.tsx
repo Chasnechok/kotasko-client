@@ -5,10 +5,13 @@ import Bell from './bell'
 import { EyeIcon } from '@heroicons/react/solid'
 import { useEffect } from 'react'
 import { useNotifications } from '../../hooks/useNotifications'
+import IUser from '../../models/user'
 
-interface NotificationsProps {}
+interface NotificationsProps {
+    currUser: IUser
+}
 
-const Notifications: React.FC<NotificationsProps> = ({}) => {
+const Notifications: React.FC<NotificationsProps> = ({ currUser }) => {
     const { data: notifications } = useNotifications()
     const hasNew = notifications && notifications.some((nf) => !nf.isSeen)
     const newNfs = hasNew && notifications.filter((nf) => !nf.isSeen)
@@ -79,7 +82,7 @@ const Notifications: React.FC<NotificationsProps> = ({}) => {
                                         {notifications && (
                                             <ul>
                                                 {notifications.map((nf) => (
-                                                    <Notification key={nf._id} notification={nf} />
+                                                    <Notification currUser={currUser} key={nf._id} notification={nf} />
                                                 ))}
                                             </ul>
                                         )}
