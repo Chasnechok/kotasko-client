@@ -125,7 +125,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
                         >
                             {!isCreator() && (
                                 <div className="px-1 py-1">
-                                    <Menu.Item disabled={task.state == TaskStates.PENDING_REVIEW}>
+                                    <Menu.Item disabled={task.state !== TaskStates.CREATED}>
                                         {({ active }) => (
                                             <button
                                                 disabled={task.state == TaskStates.PENDING_REVIEW}
@@ -141,7 +141,9 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
                                                 />
                                                 {task.state == TaskStates.PENDING_REVIEW
                                                     ? 'На ревизии'
-                                                    : 'Поручение исполненно'}
+                                                    : task.state == TaskStates.FINISHED
+                                                    ? 'Поручение исполненно'
+                                                    : 'На проверку'}
                                             </button>
                                         )}
                                     </Menu.Item>
