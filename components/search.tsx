@@ -23,6 +23,7 @@ const Search: React.FC<SearchProps> = ({ setItems, items, className, searchBy })
     const memory = useMemo(() => items, [])
     function handleFilter(e) {
         if (!e.target.value) return setItems(memory)
+        if (!memory) return
         const filtered = memory.filter((item) => {
             switch (searchBy) {
                 case SearchEntities.USERS: {
