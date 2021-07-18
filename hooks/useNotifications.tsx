@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Socket, io } from 'socket.io-client'
 import { API_URL } from '../http'
 import INotification, { NotificationsTypes } from '../models/notification'
@@ -7,31 +7,59 @@ import { MUTATE_CHORE_LIST as mutateChores } from '../pages/chores'
 import { MUTATE_FILE_LIST as mutateFiles } from '../pages/files'
 import { MUTATE_TASK_LIST as mutateTasks } from '../pages/tasks'
 import NotificationsService from '../services/notifications.service'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-    getNotifications,
-    setNotifications,
-    addNotification,
-    removeNotification,
-} from '../components/notifications/notifications.slice'
+import useSWR, { mutate } from 'swr'
+
+type SupportedEntities = 'referencedChore' | 'referencedTask' | 'referencedFile'
+export function addNotification(nf: INotification, filterBy?: SupportedEntities) {
+    if (filterBy) {
+        return mutate(
+            '/notifications',
+            (nfs) => {
+                const filtered = nfs.filter((n) => (n[filterBy] ? n[filterBy]._id !== nf[filterBy]._id : true))
+                return [nf, ...filtered]
+            },
+            false
+        )
+    }
+    return mutate('/notifications', (nfs) => [nf, ...nfs], false)
+}
+export function removeNotification(nf: INotification) {
+    return mutate('/notifications', (nfs) => nfs.filter((n) => n._id !== nf._id), false)
+}
+
+export function removeNotificationByEntity<T extends { _id: string }>(filterBy: SupportedEntities, entity: T) {
+    return mutate(
+        '/notifications',
+        (nfs) => nfs.filter((n) => (n[filterBy] ? n[filterBy]._id !== entity._id : true)),
+        false
+    )
+}
+
+export function setSeen(nf: INotification) {
+    return mutate(
+        '/notifications',
+        (nfs: INotification[]) => {
+            const r = nfs.map((n) => ({ ...n, isSeen: n._id == nf._id || n.isSeen }))
+            return r
+        },
+        false
+    )
+}
 
 export function useNotifications() {
-    const [loading, setLoading] = useState(true)
-    const notifications = useSelector(getNotifications)
-    const dispatch = useDispatch()
+    const { data, error } = useSWR<INotification[]>('/notifications', {
+        revalidateOnFocus: false,
+    })
+    const loading = !data && !error
     const socket = useRef<Socket>()
     const router = useRouter()
     useEffect(() => {
-        setLoading(true)
         socket.current = io(API_URL + '/notifications', {
             withCredentials: true,
             transports: ['websocket'],
         })
-        socket.current.emit('list')
-        socket.current.on('list', (data) => {
-            dispatch(setNotifications(data))
-            setLoading(false)
-        })
+        socket.current.emit('room')
+        socket.current.io.on('reconnect', () => socket.current.emit('room'))
         socket.current.on('notification', (nf: INotification) => {
             const onFilesPage = document.location.pathname == '/files'
             const onTasksPage = document.location.pathname == '/tasks'
@@ -41,7 +69,7 @@ export function useNotifications() {
             switch (nf.type) {
                 case NotificationsTypes.NEW_SHARED_FILE:
                     if (onFilesPage && mutateFiles) mutateFiles()
-                    dispatch(addNotification(nf))
+                    addNotification(nf)
                     break
                 case NotificationsTypes.FILE_UNSHARED:
                     if (onFilesPage && mutateFiles) mutateFiles()
@@ -49,7 +77,7 @@ export function useNotifications() {
                     break
                 case NotificationsTypes.NEW_TASK:
                     if (onTasksPage && mutateTasks) mutateTasks()
-                    dispatch(addNotification(nf))
+                    addNotification(nf)
                     break
                 case NotificationsTypes.TASK_REMOVED:
                 case NotificationsTypes.TASK_UNASSIGNED:
@@ -59,31 +87,31 @@ export function useNotifications() {
                         }
                         mutateTasks()
                     }
-                    dispatch(removeNotification(nf))
+                    removeNotification(nf)
                     break
                 case NotificationsTypes.UPDATE_TASK:
                 case NotificationsTypes.COMPLETE_TASK:
                     if (onTasksPage && mutateTasks) mutateTasks()
                     if (onTasksPage && document.location.search.includes(nf.referencedTask?._id)) {
                         NotificationsService.remove(nf)
-                    } else dispatch(addNotification(Object.assign(nf, { filterBy: 'referencedTask' })))
+                    } else addNotification(nf, 'referencedTask')
 
                     break
                 case NotificationsTypes.NEW_TASK_MESSAGE:
                     if (onTasksPage && document.location.search.includes(nf.referencedTask?._id)) {
                         NotificationsService.remove(nf)
-                    } else dispatch(addNotification(Object.assign(nf, { filterBy: 'referencedTask' })))
+                    } else addNotification(nf, 'referencedTask')
                     break
                 case NotificationsTypes.NEW_CHORE:
                     if (onChoresPage && mutateChores) mutateChores()
-                    dispatch(addNotification(nf))
+                    addNotification(nf)
                     break
                 case NotificationsTypes.CHORE_SOLVED:
                 case NotificationsTypes.CHORE_UPDATED:
                     if (onChoresPage && mutateChores) mutateChores()
                     if (onChoresPage && document.location.search.includes(nf.referencedChore?._id)) {
                         NotificationsService.remove(nf)
-                    } else dispatch(addNotification(Object.assign(nf, { filterBy: 'referencedChore' })))
+                    } else addNotification(nf, 'referencedChore')
                     break
                 case NotificationsTypes.CHORE_REMOVED:
                     if (onChoresPage && mutateChores) {
@@ -92,12 +120,12 @@ export function useNotifications() {
                         }
                         mutateChores()
                     }
-                    dispatch(removeNotification(nf))
+                    removeNotification(nf)
                     break
                 case NotificationsTypes.NEW_CHORE_MESSAGE:
                     if (onChoresPage && document.location.search.includes(nf.referencedChore?._id)) {
                         NotificationsService.remove(nf)
-                    } else dispatch(addNotification(Object.assign(nf, { filterBy: 'referencedChore' })))
+                    } else addNotification(nf, 'referencedChore')
                     break
                 default:
                     console.log(nf)
@@ -110,6 +138,6 @@ export function useNotifications() {
 
     return {
         loading,
-        notifications,
+        data,
     }
 }

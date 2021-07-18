@@ -12,15 +12,14 @@ interface ChatProps {
     currUser: IUser
     messageType: MessagesTypes
     attachments: 'single' | 'none' | 'multiple'
-    fetchUrl: string
     // entity id, ex: message.id
     busId: string
     className?: string
 }
 
-const Chat: React.FC<ChatProps> = ({ fetchUrl, busId, currUser, attachments, className, messageType }) => {
+const Chat: React.FC<ChatProps> = ({ busId, currUser, attachments, className, messageType }) => {
     const listRef = useRef<HTMLDivElement>()
-    const { messages, loading } = useMessageBus(busId)
+    const { data: messages, loading } = useMessageBus(busId)
 
     useEffect(() => {
         if (listRef.current) {

@@ -39,7 +39,6 @@ const TaskExpanded: React.FC<ChoreExpandedProps> = ({ taskId, user }) => {
                     currUser={user}
                     attachments="single"
                     messageType={MessagesTypes.INTASK_MESSAGE}
-                    fetchUrl={'/messages/listForTask'}
                     busId={taskId}
                 />
             </div>

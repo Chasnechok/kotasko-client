@@ -80,7 +80,7 @@ const ChoreComponent: React.FC<ChoreComponentProps> = ({ chore, currUser, mutate
             />
             <DialogModal
                 title="Решить запрос"
-                description="Можете присвоить запросу категории. Пользователь "
+                description="Можете присвоить запросу категории"
                 setFormOpened={setSolveFormOpened}
                 formOpened={solveFormOpened}
             >

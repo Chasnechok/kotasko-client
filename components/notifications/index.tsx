@@ -9,7 +9,7 @@ import { useNotifications } from '../../hooks/useNotifications'
 interface NotificationsProps {}
 
 const Notifications: React.FC<NotificationsProps> = ({}) => {
-    const { notifications } = useNotifications()
+    const { data: notifications } = useNotifications()
     const hasNew = notifications && notifications.some((nf) => !nf.isSeen)
     const newNfs = hasNew && notifications.filter((nf) => !nf.isSeen)
 

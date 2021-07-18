@@ -7,8 +7,6 @@ import filesize from 'filesize'
 import downloadFile from '../../http/download-file'
 import Link from 'next/link'
 import NotificationsService from '../../services/notifications.service'
-import { useDispatch } from 'react-redux'
-import { setSeen } from './notifications.slice'
 
 interface NotificationProps {
     notification: INotification
@@ -16,13 +14,11 @@ interface NotificationProps {
 
 const Notification: React.FC<NotificationProps> = ({ notification }) => {
     const [opened, setOpened] = useState(false)
-    const dispatch = useDispatch()
     useEffect(() => {
         let timer
         if (!notification.isSeen && opened) {
             timer = setTimeout(async () => {
                 NotificationsService.setSeen(notification)
-                dispatch(setSeen(notification))
             }, 200)
         }
         return () => {

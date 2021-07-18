@@ -40,7 +40,6 @@ const ChoreExpanded: React.FC<ChoreExpandedProps> = ({ choreId, user }) => {
                     currUser={user}
                     attachments="none"
                     messageType={MessagesTypes.INCHORE_MESSAGE}
-                    fetchUrl={`/messages/listForChore?choreId=${choreId}`}
                     busId={choreId}
                 />
             </div>

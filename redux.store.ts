@@ -1,11 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
 import alertsSlice from './components/alerts/alerts.slice'
-import notificationsSlice from './components/notifications/notifications.slice'
 
 export const store = configureStore({
     reducer: {
         alerts: alertsSlice,
-        notifications: notificationsSlice,
     },
 })
 

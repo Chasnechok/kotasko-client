@@ -1,3 +1,4 @@
+import { setSeen } from '../hooks/useNotifications'
 import $api from '../http'
 import INotification, { NotificationsTypes } from '../models/notification'
 import { AlertsService } from './alerts.service'
@@ -5,6 +6,7 @@ import { AlertsService } from './alerts.service'
 export default class NotificationsService {
     static async setSeen(notification: INotification) {
         try {
+            setSeen(notification)
             return await $api.patch('/notifications/setSeenStatus', {
                 notificationId: notification._id,
                 isSeen: true,
