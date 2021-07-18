@@ -117,79 +117,79 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
                             })}
                         </p>
 
-                        {task.state !== TaskStates.FINISHED && (
-                            <MenuDropdown
-                                type="dots"
-                                buttonClassName="bg-transparent"
-                                chevronClassName="text-gray-500 hover:text-gray-400"
-                                width="w-56"
-                            >
-                                {!isCreator() && (
-                                    <div className="px-1 py-1">
-                                        <Menu.Item disabled={task.state == TaskStates.PENDING_REVIEW}>
+                        <MenuDropdown
+                            type="dots"
+                            buttonClassName="bg-transparent"
+                            chevronClassName="text-gray-500 hover:text-gray-400"
+                            width="w-56"
+                        >
+                            {!isCreator() && (
+                                <div className="px-1 py-1">
+                                    <Menu.Item disabled={task.state == TaskStates.PENDING_REVIEW}>
+                                        {({ active }) => (
+                                            <button
+                                                disabled={task.state == TaskStates.PENDING_REVIEW}
+                                                onClick={(e) => setState(e, TaskStates.PENDING_REVIEW)}
+                                                className={`${
+                                                    active ? 'bg-yellow-500 text-white' : 'text-gray-900'
+                                                } flex rounded-md select-none items-center w-full px-2 py-2 text-xs lg:text-sm relative`}
+                                            >
+                                                <ThumbUpIcon
+                                                    className={`"h-5 w-5 mr-2 ${
+                                                        !active ? 'text-yellow-500' : 'text-white'
+                                                    }`}
+                                                />
+                                                {task.state == TaskStates.PENDING_REVIEW
+                                                    ? 'На ревизии'
+                                                    : 'Поручение исполненно'}
+                                            </button>
+                                        )}
+                                    </Menu.Item>
+                                </div>
+                            )}
+                            {isCreator() && task.state == TaskStates.PENDING_REVIEW && (
+                                <div className="px-1 py-1">
+                                    <Fragment>
+                                        <Menu.Item>
                                             {({ active }) => (
                                                 <button
-                                                    disabled={task.state == TaskStates.PENDING_REVIEW}
-                                                    onClick={(e) => setState(e, TaskStates.PENDING_REVIEW)}
+                                                    className={`${
+                                                        active ? 'bg-green-500 text-white' : 'text-gray-900'
+                                                    } flex text-xs lg:text-sm rounded-md select-none items-center w-full px-2 py-2 relative`}
+                                                    onClick={(e) => setState(e, TaskStates.FINISHED)}
+                                                >
+                                                    <ThumbUpIcon
+                                                        className={`"h-5 w-5 mr-2 ${
+                                                            !active ? 'text-green-500' : 'text-white'
+                                                        }`}
+                                                    />
+                                                    Поручение исполненно
+                                                </button>
+                                            )}
+                                        </Menu.Item>
+                                        <Menu.Item>
+                                            {({ active }) => (
+                                                <button
                                                     className={`${
                                                         active ? 'bg-yellow-500 text-white' : 'text-gray-900'
                                                     } flex rounded-md select-none items-center w-full px-2 py-2 text-xs lg:text-sm relative`}
+                                                    onClick={(e) => setState(e, TaskStates.CREATED)}
                                                 >
-                                                    <ThumbUpIcon
+                                                    <ThumbDownIcon
                                                         className={`"h-5 w-5 mr-2 ${
                                                             !active ? 'text-yellow-500' : 'text-white'
                                                         }`}
                                                     />
-                                                    {TaskStates.PENDING_REVIEW
-                                                        ? 'Ожидает ревизии'
-                                                        : 'Поручение исполненно'}
+                                                    На доработку
                                                 </button>
                                             )}
                                         </Menu.Item>
-                                    </div>
-                                )}
-                                {isCreator() && task.state == TaskStates.PENDING_REVIEW && (
-                                    <div className="px-1 py-1">
-                                        <Fragment>
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <button
-                                                        className={`${
-                                                            active ? 'bg-green-500 text-white' : 'text-gray-900'
-                                                        } flex text-xs lg:text-sm rounded-md select-none items-center w-full px-2 py-2 relative`}
-                                                        onClick={(e) => setState(e, TaskStates.FINISHED)}
-                                                    >
-                                                        <ThumbUpIcon
-                                                            className={`"h-5 w-5 mr-2 ${
-                                                                !active ? 'text-green-500' : 'text-white'
-                                                            }`}
-                                                        />
-                                                        Поручение исполненно
-                                                    </button>
-                                                )}
-                                            </Menu.Item>
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <button
-                                                        className={`${
-                                                            active ? 'bg-yellow-500 text-white' : 'text-gray-900'
-                                                        } flex rounded-md select-none items-center w-full px-2 py-2 text-xs lg:text-sm relative`}
-                                                        onClick={(e) => setState(e, TaskStates.CREATED)}
-                                                    >
-                                                        <ThumbDownIcon
-                                                            className={`"h-5 w-5 mr-2 ${
-                                                                !active ? 'text-yellow-500' : 'text-white'
-                                                            }`}
-                                                        />
-                                                        На доработку
-                                                    </button>
-                                                )}
-                                            </Menu.Item>
-                                        </Fragment>
-                                    </div>
-                                )}
-                                {isCreator() && (
-                                    <div className="px-1 py-1 ">
+                                    </Fragment>
+                                </div>
+                            )}
+                            {isCreator() && (
+                                <div className="px-1 py-1 ">
+                                    {task.state !== TaskStates.FINISHED && (
                                         <Menu.Item>
                                             {({ active }) => (
                                                 <button
@@ -207,27 +207,27 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
                                                 </button>
                                             )}
                                         </Menu.Item>
-                                        <Menu.Item>
-                                            {({ active }) => (
-                                                <button
-                                                    className={`${
-                                                        active ? 'bg-red-500 text-white' : 'text-gray-900'
-                                                    } flex rounded-md select-none items-center w-full px-2 py-2 text-xs lg:text-sm relative`}
-                                                    onClick={openDeleteConfirm}
-                                                >
-                                                    <TrashIcon
-                                                        className={`"h-5 w-5 mr-2 ${
-                                                            !active ? 'text-red-500' : 'text-white'
-                                                        }`}
-                                                    />
-                                                    Удалить
-                                                </button>
-                                            )}
-                                        </Menu.Item>
-                                    </div>
-                                )}
-                            </MenuDropdown>
-                        )}
+                                    )}
+                                    <Menu.Item>
+                                        {({ active }) => (
+                                            <button
+                                                className={`${
+                                                    active ? 'bg-red-500 text-white' : 'text-gray-900'
+                                                } flex rounded-md select-none items-center w-full px-2 py-2 text-xs lg:text-sm relative`}
+                                                onClick={openDeleteConfirm}
+                                            >
+                                                <TrashIcon
+                                                    className={`"h-5 w-5 mr-2 ${
+                                                        !active ? 'text-red-500' : 'text-white'
+                                                    }`}
+                                                />
+                                                Удалить
+                                            </button>
+                                        )}
+                                    </Menu.Item>
+                                </div>
+                            )}
+                        </MenuDropdown>
                     </div>
                     <p
                         className={`select-none flex items-center before:mr-2 font-medium text-lg before:block before:w-2 before:h-2 before:rounded-full
