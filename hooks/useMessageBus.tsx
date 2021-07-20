@@ -18,7 +18,7 @@ export function useMessageBus(busId: string) {
             withCredentials: true,
             transports: ['websocket'],
         })
-        socket.current.emit('room', { entityId: busId })
+        socket.current.on('connect', () => socket.current.emit('room', { entityId: busId }))
         socket.current.io.on('reconnect', () => socket.current.emit('room', { entityId: busId }))
         socket.current.on('message', (data) => {
             mutate((msgs) => [...msgs, data], false)
