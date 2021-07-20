@@ -17,7 +17,7 @@ const ChoreCreateLsi = {
     },
     choreCateg: {
         ru: 'Запрос категоризирован',
-        ua: 'Запит зкатегоризовано',
+        ua: 'Запит категоризовано',
     },
     acceptedChore: {
         ru: 'принял запрос',
