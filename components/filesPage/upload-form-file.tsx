@@ -1,6 +1,9 @@
 import { ChevronUpIcon } from '@heroicons/react/outline'
 import { Disclosure } from '@headlessui/react'
 import filesize from 'filesize'
+import FilesLsi from '@lsi/files/index.lsi'
+import UploadFormLsi from '@lsi/files/upload-form.lsi'
+import useLocale from '@hooks/useLocale'
 
 interface UploadFormFileProps {
     file: File
@@ -8,6 +11,7 @@ interface UploadFormFileProps {
 }
 
 const UploadFormFile: React.FC<UploadFormFileProps> = ({ file, canUpload }) => {
+    const { locale } = useLocale()
     return (
         <Disclosure>
             {({ open }) => (
@@ -31,7 +35,8 @@ const UploadFormFile: React.FC<UploadFormFileProps> = ({ file, canUpload }) => {
                     </Disclosure.Button>
                     <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
                         <p className="select-none">
-                            Размер {filesize(file.size)} {canUpload ? '' : ' превышает допустимый'}
+                            {FilesLsi.size[locale]} {filesize(file.size)}{' '}
+                            {canUpload ? '' : ` ${UploadFormLsi.fileExceesQuota[locale]}`}
                         </p>
                     </Disclosure.Panel>
                 </>

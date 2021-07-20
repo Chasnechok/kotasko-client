@@ -1,8 +1,8 @@
 import { Transition } from '@headlessui/react'
 import { InformationCircleIcon, CheckCircleIcon, BanIcon } from '@heroicons/react/outline'
 import { useEffect, Fragment, useState } from 'react'
-import { AlertsService } from '../../services/alerts.service'
-import IAlert from './alert.type'
+import { AlertsService } from '@services/alerts.service'
+import IAlert from '@models/alert.model'
 
 interface AlertComponentProps {
     alert: IAlert

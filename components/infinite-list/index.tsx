@@ -1,4 +1,4 @@
-import { ReactChild, PropsWithChildren, useRef, useEffect, useCallback, FC, Children, MutableRefObject } from 'react'
+import { ReactChild, PropsWithChildren, useRef, useEffect, useCallback, FC, MutableRefObject } from 'react'
 import { PuffLoader } from 'react-spinners'
 import { useSWRInfinite } from 'swr'
 import EmptyIcon from '../../public/icons/empty.svg'
@@ -76,16 +76,16 @@ function InfiniteList<Entity extends FC<InfiniteListProps<Entity>>>({
         <div className="overflow-y-auto h-full relative">
             {isEmpty() && !isLoading && (
                 <div className="flex flex-col select-none align-middle mt-10 opacity-50">
-                    <h1 className="text-center ">{emptyMessage || 'Здесь пусто'}</h1>
+                    <h1 className="text-center ">{emptyMessage || 'Тут пусто'}</h1>
                     <Image className="pointer-events-none" src={EmptyIcon} />
                 </div>
             )}
             <ul className="lg:mr-2">
                 {data &&
                     data.map((res) => {
+                        // children should always receive mutate function
                         if (!res || !res.data) return children(null, mutate, isValidating)
                         const items = res.data.filter((entity) => shouldRender(entity))
-                        // children should always receive mutate function
                         if (!items || !items.length) return children(null, mutate, isValidating)
                         return items.map((entity, i) => {
                             return i == items.length - 1 ? (

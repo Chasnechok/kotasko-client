@@ -1,5 +1,7 @@
-import IUser, { UserStatesTypes } from '../../../models/user'
-import UsersService from '../../../services/users.service'
+import useLocale from '@hooks/useLocale'
+import UserCreateLsi from '@lsi/admin/user-create.lsi'
+import IUser, { UserStatesTypes } from '@models/user'
+import UsersService from '@services/users.service'
 
 interface UserComponentProps {
     user: IUser
@@ -7,24 +9,25 @@ interface UserComponentProps {
 }
 
 const UserComponent: React.FC<UserComponentProps> = ({ user, onClick }) => {
+    const { locale } = useLocale()
     function userStateComponent(user: IUser) {
         switch (user.state) {
             case UserStatesTypes.ACTIVE:
                 return (
                     <p className="flex justify-end items-center after:block after:h-2 after:w-2 after:rounded-full after:bg-blue-600 after:ring-1 after:ring-offset-1">
-                        <span className="mr-1 text-xs">Активный</span>
+                        <span className="mr-1 text-xs">{UserCreateLsi.stateActive[locale]}</span>
                     </p>
                 )
             case UserStatesTypes.CREATED:
                 return (
                     <p className="flex justify-end items-center after:block after:h-2 after:w-2 after:rounded-full after:bg-yellow-600 after:ring-1 after:ring-offset-1">
-                        <span className="mr-1 text-xs">Создан</span>
+                        <span className="mr-1 text-xs">{UserCreateLsi.stateCreated[locale]}</span>
                     </p>
                 )
             case UserStatesTypes.ARCHIVED:
                 return (
                     <p className="flex justify-end items-center after:block after:h-2 after:w-2 after:rounded-full after:bg-gray-600 after:ring-1 after:ring-offset-1">
-                        <span className="mr-1 text-xs">Архив</span>
+                        <span className="mr-1 text-xs">{UserCreateLsi.stateArchived[locale]}</span>
                     </p>
                 )
         }

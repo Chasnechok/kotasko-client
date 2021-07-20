@@ -1,20 +1,20 @@
-import $api from '../../http'
 import formatReqCookies from '../../http/cookie'
-import IUser, { UserRoleTypes } from '../../models/user'
-import Layout from '../../components/_layout'
+import IUser, { UserRoleTypes } from '@models/user'
+import Layout from '@components/_layout'
 import { Fragment, useState } from 'react'
 import Head from 'next/head'
-import Lsi from '../../lsi/admin/index.lsi'
-import Column from '../../components/adminPage/column'
-import OrgCreateForm from '../../components/adminPage/organisation/org-create-form'
-import { useAppUsers, useDepList, useOrgList } from '../../hooks/useFetchCollection'
-import OrgComponent from '../../components/adminPage/organisation/org-component'
-import DepCreateForm from '../../components/adminPage/department/dep-create-form'
-import DepComponent from '../../components/adminPage/department/dep-component'
-import UserComponent from '../../components/adminPage/user/user-component'
-import UserCreateForm from '../../components/adminPage/user/user-create-form'
-import UserEditForm from '../../components/adminPage/user/user-edit-form'
+import Lsi from '@lsi/admin/index.lsi'
+import Column from '@components/adminPage/column'
+import OrgCreateForm from '@components/adminPage/organisation/org-create-form'
+import { useAppUsers, useDepList, useOrgList } from '@hooks/useFetchCollection'
+import OrgComponent from '@components/adminPage/organisation/org-component'
+import DepCreateForm from '@components/adminPage/department/dep-create-form'
+import DepComponent from '@components/adminPage/department/dep-component'
+import UserComponent from '@components/adminPage/user/user-component'
+import UserCreateForm from '@components/adminPage/user/user-create-form'
+import UserEditForm from '@components/adminPage/user/user-edit-form'
 import axios from 'axios'
+import useLocale from '@hooks/useLocale'
 
 interface AdminPageProps {
     userFromSession: IUser
@@ -29,6 +29,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ userFromSession }) => {
     const { loading: orgsLoading, data: orgs, mutate: updateOrgList } = useOrgList()
     const { loading: depsLoading, data: deps, mutate: updateDepList } = useDepList()
     const { loading: usersLoading, data: appUsers } = useAppUsers()
+    const { locale } = useLocale()
 
     function openEditForm(target: IUser) {
         setUserEditFromOpened(true)
@@ -37,10 +38,10 @@ const AdminPage: React.FC<AdminPageProps> = ({ userFromSession }) => {
 
     return (
         <Layout userFromSession={userFromSession}>
-            {(language, user) => (
+            {(user) => (
                 <Fragment>
                     <Head>
-                        <title>Kotasko | {Lsi.pageName[language]}</title>
+                        <title>Kotasko | {Lsi.pageName[locale]}</title>
                         <link rel="icon" href="/favicon.ico" />
                     </Head>
                     <section className="flex flex-wrap h-full justify-center">
@@ -49,7 +50,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ userFromSession }) => {
                             formOpened={orgFormOpened}
                             setFormOpened={setOrgFormOpened}
                         />
-                        <Column loading={orgsLoading} name="Структуры" setFormOpened={setOrgFormOpened}>
+                        <Column loading={orgsLoading} name={Lsi.structures[locale]} setFormOpened={setOrgFormOpened}>
                             {orgs && orgs.map((org) => <OrgComponent key={org._id} organisation={org} />)}
                         </Column>
 
@@ -62,7 +63,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ userFromSession }) => {
                             />
                         )}
 
-                        <Column loading={depsLoading} name="Подразделения" setFormOpened={setDepFormOpened}>
+                        <Column loading={depsLoading} name={Lsi.departments[locale]} setFormOpened={setDepFormOpened}>
                             {deps && deps.map((dep) => <DepComponent key={dep._id} department={dep} />)}
                         </Column>
 
@@ -73,7 +74,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ userFromSession }) => {
                             user={editingUser}
                             adminUser={user}
                         />
-                        <Column loading={usersLoading} name="Пользователи" setFormOpened={setUsersFormOpened}>
+                        <Column loading={usersLoading} name={Lsi.users[locale]} setFormOpened={setUsersFormOpened}>
                             {appUsers &&
                                 appUsers.map((u) => (
                                     <UserComponent onClick={() => openEditForm(u)} key={u._id} user={u} />

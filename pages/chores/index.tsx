@@ -1,18 +1,17 @@
-import IUser, { UserRoleTypes } from '../../models/user'
-import IChore, { ChoreStates } from '../../models/chore'
+import IUser, { UserRoleTypes } from '@models/user'
+import IChore, { ChoreStates } from '@models/chore'
 import Head from 'next/head'
 import React, { Fragment, useState } from 'react'
-import $api from '../../http'
 import formatReqCookies from '../../http/cookie'
-import Lsi from '../../lsi/chores/index.lsi'
-import Layout from '../../components/_layout'
-import Listbox from '../../components/listbox'
+import Lsi from '@lsi/chores/index.lsi'
+import Layout from '@components/_layout'
+import Listbox from '@components/listbox'
 import { useRouter } from 'next/router'
-import ChoreExpanded from '../../components/choresPage/chore-expanded'
-import InfiniteList from '../../components/infinite-list'
-import ChoreComponent from '../../components/choresPage/chore-component'
+import ChoreExpanded from '@components/choresPage/chore-expanded'
+import InfiniteList from '@components/infinite-list'
+import ChoreComponent from '@components/choresPage/chore-component'
 import { PlusIcon } from '@heroicons/react/outline'
-import ChoreCreateForm from '../../components/choresPage/chore-create-form'
+import ChoreCreateForm from '@components/choresPage/chore-create-form'
 import axios from 'axios'
 
 export let MUTATE_CHORE_LIST
@@ -23,6 +22,7 @@ interface ChoresPageProps {
 
 const ChoresPage: React.FC<ChoresPageProps> = ({ userFromSession }) => {
     const router = useRouter()
+    const locale = router.locale
     const [createFormOpened, setCreateFormOpened] = useState(false)
     const showActive = router.query.active == 'true' || !router.query.active
     function setShowActive(v: boolean) {
@@ -39,21 +39,21 @@ const ChoresPage: React.FC<ChoresPageProps> = ({ userFromSession }) => {
 
     const options = [
         {
-            label: 'Решенные',
+            label: Lsi.choresSolved[locale],
             value: false,
         },
         {
-            label: 'Активные',
+            label: Lsi.choresActive[locale],
             value: true,
         },
     ]
 
     return (
         <Layout userFromSession={userFromSession}>
-            {(language, user) => (
+            {(user) => (
                 <Fragment>
                     <Head>
-                        <title>Kotasko | {Lsi.pageName[language]}</title>
+                        <title>Kotasko | {Lsi.pageName[locale]}</title>
                         <link rel="icon" href="/favicon.ico" />
                     </Head>
 
@@ -82,7 +82,7 @@ const ChoresPage: React.FC<ChoresPageProps> = ({ userFromSession }) => {
                                         shouldRender={shouldRender}
                                         fetchUrl="/chores/list"
                                         pageSize={10}
-                                        emptyMessage="Здесь пока нет запросов"
+                                        emptyMessage={Lsi.noChores[locale]}
                                     >
                                         {(chore, mutate) => {
                                             MUTATE_CHORE_LIST = mutate

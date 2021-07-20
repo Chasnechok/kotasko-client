@@ -1,3 +1,5 @@
+import useLocale from '@hooks/useLocale'
+import GlobalLsi from '@lsi/global.lsi'
 import { Dispatch, SetStateAction, useEffect } from 'react'
 
 interface ButtonCountdownProps {
@@ -31,7 +33,7 @@ const ButtonCountdown: React.FC<ButtonCountdownProps> = ({
     }, [triggered])
 
     const color = accent || 'gray'
-
+    const { locale } = useLocale()
     return (
         <button
             onClick={() => setTriggered(!triggered)}
@@ -43,7 +45,7 @@ const ButtonCountdown: React.FC<ButtonCountdownProps> = ({
             px-4 overflow-hidden relative mb-1 block w-full select-none py-2 text-sm font-medium text-${color}-900 border border-transparent rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-${color}-500`}
         >
             <span className={`${triggered ? 'text-red-900' : `text-${color}-900`}`}>
-                {triggered ? 'Отменить' : label}
+                {triggered ? GlobalLsi.cancel[locale] : label}
             </span>
             <div
                 className={`w-full ${

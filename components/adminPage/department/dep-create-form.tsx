@@ -1,14 +1,15 @@
 import { Fragment, Dispatch, SetStateAction, useState, useEffect } from 'react'
-import BarLoader from 'react-spinners/BarLoader'
 import { MutatorCallback } from 'swr/dist/types'
-import $api from '../../../http'
-import IDepartment from '../../../models/department'
-import IOrganisation from '../../../models/organisation'
-import DepartmentService from '../../../services/departments.service'
-import DialogModal from '../../dialog-modal'
-import Input from '../../input'
-import Search, { SearchEntities } from '../../search'
-import SwitchGroup from '../../switch'
+import IDepartment from '@models/department'
+import IOrganisation from '@models/organisation'
+import DepartmentService from '@services/departments.service'
+import DialogModal, { DialogButtons } from '@components/dialog-modal'
+import Input from '@components/input'
+import Search, { SearchEntities } from '@components/search'
+import SwitchGroup from '@components/switch'
+import useLocale from '@hooks/useLocale'
+import DepCreateLsi from '@lsi/admin/dep-create.lsi'
+import AdminLsi from '@lsi/admin/index.lsi'
 
 interface DepCreateFormProps {
     formOpened: boolean
@@ -27,10 +28,7 @@ const DepCreateForm: React.FC<DepCreateFormProps> = ({ formOpened, setFormOpened
     const [assignedOrg, setAssignedOrg] = useState<IOrganisation>(null)
     const [orgList, setOrgList] = useState<IOrganisation[]>(organisations)
     const [serviceAllowed, setServiceAllowed] = useState(true)
-
-    function handleClose() {
-        setFormOpened(false)
-    }
+    const { locale } = useLocale()
 
     function assignOrg(assign: boolean, org: IOrganisation) {
         if (assign) {
@@ -60,24 +58,22 @@ const DepCreateForm: React.FC<DepCreateFormProps> = ({ formOpened, setFormOpened
     async function handleCreate() {
         setIsLoading(true)
         const created = await DepartmentService.create(depName, depAddress, serviceAllowed, assignedOrg)
-        updateDepList((depList) => {
-            return [created, ...depList]
-        }, false)
+        updateDepList((depList) => [created, ...depList], false)
         setIsLoading(false)
         setFormOpened(false)
     }
 
     return (
         <DialogModal
-            title="Создание департамента"
-            description="Департамент входит в Структуру и состоит из пользователей"
+            title={DepCreateLsi.title[locale]}
+            description={DepCreateLsi.description[locale]}
             formOpened={formOpened}
-            setFormOpened={setFormOpened}
+            setFormOpened={!isLoading ? setFormOpened : () => null}
         >
             <form className="pl-1 pr-4 py-3">
                 <div className="flex flex-col mb-3">
                     <Input
-                        label="Название"
+                        label={DepCreateLsi.depName[locale]}
                         required
                         id="depName"
                         value={depName}
@@ -86,7 +82,7 @@ const DepCreateForm: React.FC<DepCreateFormProps> = ({ formOpened, setFormOpened
                 </div>
                 <div className="flex flex-col mb-3">
                     <SwitchGroup
-                        label="Сервис разрешен"
+                        label={DepCreateLsi.serviceAllowed[locale]}
                         className="justify-between"
                         checked={serviceAllowed}
                         onChange={(toggled) => setServiceAllowed(toggled)}
@@ -94,7 +90,8 @@ const DepCreateForm: React.FC<DepCreateFormProps> = ({ formOpened, setFormOpened
                 </div>
                 <div className="flex flex-col mb-3">
                     <label className="select-none" htmlFor="assignedOrg">
-                        Организация<sup className="text-red-500 font-bold text-md">*</sup>
+                        {AdminLsi.structure[locale]}
+                        <sup className="text-red-500 font-bold text-md">*</sup>
                     </label>
                 </div>
                 <Fragment>
@@ -126,7 +123,7 @@ const DepCreateForm: React.FC<DepCreateFormProps> = ({ formOpened, setFormOpened
                 {assignedOrg && (
                     <div className="flex flex-col mb-3">
                         <Input
-                            label="Адрес"
+                            label={DepCreateLsi.depAddress[locale]}
                             required
                             id="depAddress"
                             value={depAddress}
@@ -135,30 +132,13 @@ const DepCreateForm: React.FC<DepCreateFormProps> = ({ formOpened, setFormOpened
                     </div>
                 )}
             </form>
-
-            <div className="mt-4 flex justify-center sm:block">
-                <button
-                    disabled={depName.length < 3 || depAddress.length < 3 || !assignOrg}
-                    type="button"
-                    className={`transition  ${
-                        isLoading ? 'pointer-events-none py-4 w-full' : 'py-2 '
-                    } px-4 select-none text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500
-                                    disabled:cursor-default disabled:text-gray-900 disabled:bg-gray-100`}
-                    onClick={handleCreate}
-                >
-                    {!isLoading && 'Cоздать'}
-                    <BarLoader css="display: block; margin: 0 auto;" loading={isLoading} color="rgba(30, 58, 138)" />
-                </button>
-                {!isLoading && (
-                    <button
-                        type="button"
-                        className="px-4 ml-2 select-none py-2 text-sm font-medium text-gray-900 bg-gray-100 border border-transparent rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
-                        onClick={handleClose}
-                    >
-                        Отменить
-                    </button>
-                )}
-            </div>
+            <DialogButtons
+                onSave={handleCreate}
+                saveButtonName={DepCreateLsi.create[locale]}
+                saveDisabled={depName.length < 3 || depAddress.length < 3 || !assignOrg}
+                onCancel={() => setFormOpened(false)}
+                isLoading={isLoading}
+            />
         </DialogModal>
     )
 }

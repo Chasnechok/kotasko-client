@@ -1,13 +1,15 @@
 import { Dispatch, SetStateAction, useState, useEffect, MouseEvent } from 'react'
-import BarLoader from 'react-spinners/BarLoader'
-import IUser from '../../../models/user'
+import IUser from '@models/user'
 import CyrillicToTranslit from 'cyrillic-to-translit-js'
 import fileSize from 'filesize'
 import { ClipboardCopyIcon } from '@heroicons/react/outline'
-import DialogModal from '../../dialog-modal'
-import SwitchGroup from '../../switch'
-import Input from '../../input'
-import UsersService from '../../../services/users.service'
+import DialogModal, { DialogButtons } from '@components/dialog-modal'
+import SwitchGroup from '@components/switch'
+import Input from '@components/input'
+import UsersService from '@services/users.service'
+import GlobalLsi from '@lsi/global.lsi'
+import useLocale from '@hooks/useLocale'
+import UserCreateLsi from '@lsi/admin/user-create.lsi'
 const ToTranslit = new CyrillicToTranslit({ preset: 'uk' })
 
 interface UserCreateFormProps {
@@ -23,6 +25,7 @@ const UserCreateForm: React.FC<UserCreateFormProps> = ({ formOpened, setFormOpen
     const [createdUser, setCreatedUser] = useState<IUser>()
     // 500 MB
     const [quota, setQuota] = useState(524288000)
+    const { locale } = useLocale()
 
     function handleClose() {
         setFormOpened(false)
@@ -61,15 +64,15 @@ const UserCreateForm: React.FC<UserCreateFormProps> = ({ formOpened, setFormOpen
 
     return (
         <DialogModal
-            title={createdUser ? 'Пользователь создан' : 'Создание пользователя'}
-            description={createdUser ? 'Реквизиты для входа' : 'Пользователь - структурная единица департамента'}
+            title={createdUser ? UserCreateLsi.userCreated[locale] : UserCreateLsi.title[locale]}
+            description={createdUser ? UserCreateLsi.credentials[locale] : UserCreateLsi.description[locale]}
             formOpened={formOpened}
             setFormOpened={setFormOpened}
         >
             {createdUser && (
                 <div>
                     <div className="flex flex-col mb-3">
-                        <p className="select-none">Имя и фамилия</p>
+                        <p className="select-none">{UserCreateLsi.nameSurname[locale]}</p>
                         <div className="relative">
                             <input
                                 value={UsersService.formatName(createdUser)}
@@ -81,7 +84,7 @@ const UserCreateForm: React.FC<UserCreateFormProps> = ({ formOpened, setFormOpen
                         </div>
                     </div>
                     <div className="flex flex-col mb-3">
-                        <p className="select-none">Логин</p>
+                        <p className="select-none">{GlobalLsi.login[locale]}</p>
                         <div className="relative">
                             <input
                                 value={createdUser.login}
@@ -93,7 +96,7 @@ const UserCreateForm: React.FC<UserCreateFormProps> = ({ formOpened, setFormOpen
                         </div>
                     </div>
                     <div className="flex flex-col mb-3">
-                        <p className="select-none">Пароль</p>
+                        <p className="select-none">{GlobalLsi.password[locale]}</p>
                         <div className="relative">
                             <input
                                 value={createdUser.password}
@@ -110,7 +113,7 @@ const UserCreateForm: React.FC<UserCreateFormProps> = ({ formOpened, setFormOpen
                             className="px-4 select-none py-2 text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
                             onClick={handleClose}
                         >
-                            Хорошо
+                            {UserCreateLsi.ok[locale]}
                         </button>
                     </div>
                 </div>
@@ -120,7 +123,7 @@ const UserCreateForm: React.FC<UserCreateFormProps> = ({ formOpened, setFormOpen
                 <form className="pl-1 pr-4 py-3">
                     <div className="flex flex-col mb-3">
                         <Input
-                            label="Имя"
+                            label={GlobalLsi.firstName[locale]}
                             id="firstName"
                             required
                             value={firstName}
@@ -129,7 +132,7 @@ const UserCreateForm: React.FC<UserCreateFormProps> = ({ formOpened, setFormOpen
                     </div>
                     <div className="flex flex-col mb-3">
                         <Input
-                            label="Фамилия"
+                            label={GlobalLsi.lastName[locale]}
                             id="lastName"
                             required
                             value={lastName}
@@ -138,8 +141,9 @@ const UserCreateForm: React.FC<UserCreateFormProps> = ({ formOpened, setFormOpen
                     </div>
                     <div className="flex flex-col mb-3">
                         <SwitchGroup
-                            label="Квота на файлы"
+                            label={UserCreateLsi.quota[locale]}
                             required
+                            className="justify-between"
                             checked={quota !== -1}
                             onChange={(value) => setQuota(!value ? -1 : 524288000)}
                         />
@@ -159,33 +163,13 @@ const UserCreateForm: React.FC<UserCreateFormProps> = ({ formOpened, setFormOpen
             )}
 
             {!createdUser && (
-                <div className="mt-4 flex justify-center sm:block">
-                    <button
-                        disabled={firstName.length < 3 || lastName.length < 3}
-                        type="button"
-                        className={`transition  ${
-                            isLoading ? 'pointer-events-none py-4 w-full' : 'py-2 '
-                        } px-4 select-none text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500
-                                    disabled:cursor-default disabled:text-gray-900 disabled:bg-gray-100`}
-                        onClick={handleCreate}
-                    >
-                        {!isLoading && 'Cоздать'}
-                        <BarLoader
-                            css="display: block; margin: 0 auto;"
-                            loading={isLoading}
-                            color="rgba(30, 58, 138)"
-                        />
-                    </button>
-                    {!isLoading && (
-                        <button
-                            type="button"
-                            className="px-4 ml-2 select-none py-2 text-sm font-medium text-gray-900 bg-gray-100 border border-transparent rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
-                            onClick={handleClose}
-                        >
-                            Отменить
-                        </button>
-                    )}
-                </div>
+                <DialogButtons
+                    saveButtonName={GlobalLsi.create[locale]}
+                    isLoading={isLoading}
+                    onCancel={handleClose}
+                    onSave={handleCreate}
+                    saveDisabled={firstName.length < 3 || lastName.length < 3}
+                />
             )}
         </DialogModal>
     )

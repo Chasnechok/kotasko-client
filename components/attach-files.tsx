@@ -7,6 +7,9 @@ import Disclosure from './disclosure'
 import SwitchGroup from './switch'
 import IUser from '../models/user'
 import InfiniteList from './infinite-list/index'
+import FilesLsi from '@lsi/files/index.lsi'
+import useLocale from '@hooks/useLocale'
+import GlobalLsi from '@lsi/global.lsi'
 
 interface AttachFilesProps {
     setInputAttachments: Dispatch<SetStateAction<InputAttachments>>
@@ -18,6 +21,7 @@ interface AttachFilesProps {
 const AttachFiles: React.FC<AttachFilesProps> = ({ single, initial, setInputAttachments, userFromSession }) => {
     const [uploadedFiles, setUploadedFiles] = useState<FileList>()
     const [error, setError] = useState('')
+    const { locale } = useLocale()
     useEffect(() => {
         if (!uploadedFiles || !uploadedFiles.length) return
         if (error) setError('')
@@ -27,7 +31,7 @@ const AttachFiles: React.FC<AttachFilesProps> = ({ single, initial, setInputAtta
                 (f) => f.size + userFromSession.spaceUsed > userFromSession.quota && userFromSession.quota !== -1
             )
         ) {
-            setError('Файл(ы) превысят вашу квоту ' + filesize(userFromSession.quota))
+            setError(FilesLsi.quotaFull[locale] + ' ' + filesize(userFromSession.quota))
             return
         }
         setInputAttachments((v) => ({
@@ -120,7 +124,7 @@ const AttachFiles: React.FC<AttachFilesProps> = ({ single, initial, setInputAtta
                     {error}
                 </p>
             )}
-            <Disclosure label="Выбрать из ваших файлов">
+            <Disclosure label={FilesLsi.filesFromServer[locale]}>
                 <div ref={rootRef} className="max-h-40 overflow-y-auto">
                     <InfiniteList<IFile & React.FC>
                         rootRef={rootRef}
@@ -138,8 +142,12 @@ const AttachFiles: React.FC<AttachFilesProps> = ({ single, initial, setInputAtta
                                     label={
                                         <>
                                             <p className="font-medium truncate">{file.originalname}</p>
-                                            <p>Размер: {filesize(file.size)}</p>
-                                            <p className="hidden text-xs md:block">Загружено: {uploadedDate(file)}</p>
+                                            <p>
+                                                {FilesLsi.size[locale]}: {filesize(file.size)}
+                                            </p>
+                                            <p className="hidden text-xs md:block">
+                                                {FilesLsi.uploaded[locale]}: {uploadedDate(file)}
+                                            </p>
                                         </>
                                     }
                                     onChange={(value) => manageServerAttachments(file, value)}
@@ -149,7 +157,9 @@ const AttachFiles: React.FC<AttachFilesProps> = ({ single, initial, setInputAtta
                     </InfiniteList>
                 </div>
             </Disclosure>
-            <p className="text-gray-500 py-2 text-center select-none">{single ? 'или' : 'и / или'}</p>
+            <p className="text-gray-500 py-2 text-center select-none">
+                {single ? GlobalLsi.or[locale] : GlobalLsi.xor[locale]}
+            </p>
             <DragArea single={single} forceRerender={uploadedFiles} setFiles={setUploadedFiles} />
             {fileComponent()}
         </div>

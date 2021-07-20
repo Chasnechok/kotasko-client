@@ -1,3 +1,6 @@
+import useLocale from '@hooks/useLocale'
+import ChatLsi from '@lsi/chat/index.lsi'
+import FilesLsi from '@lsi/files/index.lsi'
 import { Dispatch, SetStateAction } from 'react'
 import { InputAttachments } from '../../models/file'
 import IUser from '../../models/user'
@@ -21,10 +24,13 @@ const InputAttachmentForm: React.FC<InputAttachmentFormProps> = ({
     initial,
     currUser,
 }) => {
+    const { locale } = useLocale()
     return (
         <DialogModal
-            title="Добавить вложение"
-            description={`Вы можете прикрепить ${single ? 'файл' : 'файлы'}`}
+            title={ChatLsi.addAttachment[locale]}
+            description={`${ChatLsi.addAttachmentDesc[locale]} ${
+                single ? 'файл' : FilesLsi.pageName[locale].toLowerCase()
+            }`}
             formOpened={formOpened}
             setFormOpened={setFormOpened}
         >
@@ -40,7 +46,7 @@ const InputAttachmentForm: React.FC<InputAttachmentFormProps> = ({
                     className={`transition disabled:cursor-default py-2 px-4 select-none text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500`}
                     onClick={() => setFormOpened(false)}
                 >
-                    Прикрепить
+                    {ChatLsi.attach[locale]}
                 </button>
             </div>
         </DialogModal>

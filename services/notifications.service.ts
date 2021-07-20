@@ -1,8 +1,10 @@
 import { mutate } from 'swr'
-import { setSeen } from '../hooks/useNotifications'
+import { setSeen } from '@hooks/useNotifications'
 import $api from '../http'
-import INotification, { NotificationsTypes } from '../models/notification'
+import INotification, { NotificationsTypes } from '@models/notification'
 import { AlertsService } from './alerts.service'
+import router from 'next/router'
+import NotificationsLsi from '@lsi/notifications/index.lsi'
 
 export default class NotificationsService {
     static async setSeen(notification: INotification) {
@@ -50,24 +52,24 @@ export default class NotificationsService {
     static getNotificationLabel(notification: INotification) {
         switch (notification.type) {
             case NotificationsTypes.NEW_SHARED_FILE:
-                return 'Новый файл'
+                return NotificationsLsi.newFile[router.locale]
             case NotificationsTypes.NEW_TASK:
-                return 'Новое задание'
+                return NotificationsLsi.newTask[router.locale]
             case NotificationsTypes.UPDATE_TASK:
-                return 'Новая активность в задании'
+                return NotificationsLsi.updateTask[router.locale]
             case NotificationsTypes.COMPLETE_TASK:
-                return 'Задание выполненно'
+                return NotificationsLsi.completeTask[router.locale]
             case NotificationsTypes.SYSTEM:
-                return 'Системное уведомление'
+                return NotificationsLsi.system[router.locale]
             case NotificationsTypes.CHORE_UPDATED:
-                return 'Сервисный запрос обновлен'
+                return NotificationsLsi.choreUpdated[router.locale]
             case NotificationsTypes.NEW_CHORE_MESSAGE:
             case NotificationsTypes.NEW_TASK_MESSAGE:
-                return 'Новое сообщение'
+                return NotificationsLsi.newMessage[router.locale]
             case NotificationsTypes.NEW_CHORE:
-                return 'Новый сервисный запрос'
+                return NotificationsLsi.newChore[router.locale]
             default:
-                return 'Новое уведомление'
+                return NotificationsLsi.default[router.locale]
         }
     }
 }

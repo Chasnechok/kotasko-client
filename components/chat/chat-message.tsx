@@ -1,8 +1,9 @@
 import { PaperClipIcon } from '@heroicons/react/outline'
+import UsersService from '@services/users.service'
 import fileSize from 'filesize'
 import downloadFile from '../../http/download-file'
-import { IMessage, MessagesTypes } from '../../models/message'
-import IUser from '../../models/user'
+import { IMessage, MessagesTypes } from '@models/message'
+import IUser from '@models/user'
 
 interface ChatMessageProps {
     message: IMessage
@@ -11,10 +12,6 @@ interface ChatMessageProps {
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ message, user }) => {
     const isSender = message.sender && message.sender._id === user._id
-    function formatName(user: IUser) {
-        if (!user || !user.details) return 'Неизвестно'
-        return user.details.firstName + ' ' + user.details.lastName
-    }
     function isSystemMessage(message: IMessage): boolean {
         return [MessagesTypes.INCHORE_SYS_MESSAGE, MessagesTypes.INTASK_SYS_MESSAGE].includes(message.type)
     }
@@ -40,7 +37,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, user }) => {
                     day: '2-digit',
                 })}
             </p>
-            <h1 className="overflow-x-auto text-xs sm:text-sm select-none font-medium">{formatName(message.sender)}</h1>
+            <h1 className="overflow-x-auto text-xs sm:text-sm select-none font-medium">
+                {UsersService.formatName(message.sender)}
+            </h1>
             <span className="max-w-full break-words text-xs sm:text-sm whitespace-pre-line">{message.content}</span>
             {message.attachments &&
                 message.attachments.map((at) => (

@@ -1,17 +1,18 @@
 import router from 'next/router'
-import { removeNotificationByEntity } from '../hooks/useNotifications'
+import { removeNotificationByEntity } from '@hooks/useNotifications'
 import $api from '../http'
-import IChore, { ChoreStates, ChoreTypes } from '../models/chore'
-import { MessagesTypes } from '../models/message'
+import IChore, { ChoreStates, ChoreTypes } from '@models/chore'
+import { MessagesTypes } from '@models/message'
 import { AlertsService } from './alerts.service'
 import MessagesService from './messages.service'
 import UsersService from './users.service'
+import ChoreCreateLsi from '@lsi/chores/chore-create.lsi'
 
 export default class ChoresService {
     static async createChore(details: string) {
         try {
             await $api.post<IChore>('/chores/create', { details })
-            AlertsService.addAlert({ content: 'Запрос создан, компетентные особы уведомлены', theme: 'success' })
+            AlertsService.addAlert({ content: ChoreCreateLsi.onCreate[router.locale], theme: 'success' })
         } catch (error) {
             AlertsService.alertFromError(error)
         }
@@ -25,13 +26,13 @@ export default class ChoresService {
             })
             const newSolver = updated.data.solvers.concat(chore.solvers)[0]
             await MessagesService.sendMessage(
-                `${UsersService.formatName(newSolver)} принял запрос`,
+                `${UsersService.formatName(newSolver)} ${ChoreCreateLsi.acceptedChore[router.locale]}`,
                 MessagesTypes.INCHORE_SYS_MESSAGE,
                 null,
                 chore._id
             )
             AlertsService.addAlert({
-                content: 'Отныне вы ответственны за решения этого запроса',
+                content: ChoreCreateLsi.youResponsible[router.locale],
                 theme: 'success',
             })
         } catch (error) {
@@ -42,14 +43,19 @@ export default class ChoresService {
     static async finishChore(chore: IChore, types: ChoreTypes[]) {
         await Promise.all([this.setState(chore, ChoreStates.SOLVED), this.setTypes(chore, types)])
         if (types) {
-            let mess = 'Запрос категоризирован\n'
+            let mess = ChoreCreateLsi.choreCateg[router.locale] + '\n'
             types.forEach((type, i) => {
                 mess += this.formatTypeName(type) + (i == types.length - 1 ? '' : ', ')
             })
             MessagesService.sendMessage(mess, MessagesTypes.INCHORE_SYS_MESSAGE, null, chore._id)
         }
-        MessagesService.sendMessage('Запрос решен', MessagesTypes.INCHORE_SYS_MESSAGE, null, chore._id)
-        AlertsService.addAlert({ content: 'Запрос успешно завершен, пользователь уведомлен', theme: 'success' })
+        MessagesService.sendMessage(
+            ChoreCreateLsi.choreSolved[router.locale],
+            MessagesTypes.INCHORE_SYS_MESSAGE,
+            null,
+            chore._id
+        )
+        AlertsService.addAlert({ content: ChoreCreateLsi.onFinish[router.locale], theme: 'success' })
         return
     }
 
@@ -83,7 +89,7 @@ export default class ChoresService {
                 router.replace('/chores', null, { shallow: true })
             }
             removeNotificationByEntity<IChore>('referencedChore', chore)
-            AlertsService.addAlert({ content: 'Запрос удален' })
+            AlertsService.addAlert({ content: ChoreCreateLsi.onDelete[router.locale] })
         } catch (error) {
             AlertsService.alertFromError(error)
         }
@@ -92,23 +98,24 @@ export default class ChoresService {
     static formatTypeName(type: ChoreTypes) {
         switch (type) {
             case ChoreTypes.APP_HELP:
-                return 'Настройка приложения'
+                return ChoreCreateLsi.typeAppHelp[router.locale]
             case ChoreTypes.APP_INSTALL:
-                return 'Установка приложения'
+                return ChoreCreateLsi.typeAppInstall[router.locale]
             case ChoreTypes.CONNECTION:
-                return 'Проблемы с соединением'
+                return ChoreCreateLsi.typeConnection[router.locale]
             case ChoreTypes.FILES_MISSING:
-                return 'Пропали файлы'
+                return ChoreCreateLsi.typeFilesMissing[router.locale]
             case ChoreTypes.OS_REINSTALL:
-                return 'Переустановка системы'
+                return ChoreCreateLsi.typeOsReinstall[router.locale]
             case ChoreTypes.OS_SLOW:
-                return 'Система тормозит'
-            case ChoreTypes.OTHER:
-                return 'Другое'
+                return ChoreCreateLsi.typeOsSlow[router.locale]
             case ChoreTypes.PRINTER_BROKE:
-                return 'Проблема с принтером'
+                return ChoreCreateLsi.typePrinterBroke[router.locale]
             case ChoreTypes.VIRUS:
-                return 'Вирус в системе'
+                return ChoreCreateLsi.typeVirus[router.locale]
+            case ChoreTypes.OTHER:
+            default:
+                return ChoreCreateLsi.typeOther[router.locale]
         }
     }
 }

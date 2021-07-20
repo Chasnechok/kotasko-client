@@ -1,20 +1,20 @@
-import IChore, { ChoreStates, ChoreTypes } from '../../models/chore'
+import IChore, { ChoreStates, ChoreTypes } from '@models/chore'
 import Link from 'next/link'
-import IUser, { UserRoleTypes } from '../../models/user'
+import IUser, { UserRoleTypes } from '@models/user'
 import MenuDropdown from '../dropdown'
 import { Menu } from '@headlessui/react'
 import React, { useState, Fragment, useEffect } from 'react'
 import { HandIcon, TrashIcon, ShieldCheckIcon } from '@heroicons/react/outline'
 import SimpleSpinner from '../simple-spinner'
-import DialogModal from '../dialog-modal'
+import DialogModal, { DialogButtons } from '../dialog-modal'
 import SwitchGroup from '../switch'
-import ChoreService from '../../services/chores.service'
 import ChoreTypeIcon from './chore-type-icon'
-import BarLoader from 'react-spinners/BarLoader'
-import UsersService from '../../services/users.service'
-import ChoresService from '../../services/chores.service'
+import UsersService from '@services/users.service'
+import ChoresService from '@services/chores.service'
 import ConfirmDialog from '../confirm-dialog'
 import { useRouter } from 'next/router'
+import ChoresLsi from '@lsi/chores/index.lsi'
+import GlobalLsi from '@lsi/global.lsi'
 
 interface ChoreComponentProps {
     chore: IChore
@@ -30,6 +30,7 @@ const ChoreComponent: React.FC<ChoreComponentProps> = ({ chore, currUser, mutate
     const inSolvers = chore.solvers.some((s) => s._id === currUser._id)
     const isTechnician = currUser && currUser.roles.includes(UserRoleTypes.TECHNICIAN)
     const router = useRouter()
+    const locale = router.locale
     const isSelected = router.query.choreId === chore._id
 
     useEffect(() => {
@@ -72,15 +73,15 @@ const ChoreComponent: React.FC<ChoreComponentProps> = ({ chore, currUser, mutate
     return (
         <Fragment>
             <ConfirmDialog
-                title="Подтвердите удаление"
-                description={`Вы собираетесь удалить этот сервисный запрос`}
+                title={ChoresLsi.confirmDelete[locale]}
+                description={ChoresLsi.confirmDeleteDesc[locale]}
                 onFire={deleteChore}
                 opened={deleteTriggered}
                 setOpened={setDeleteTriggered}
             />
             <DialogModal
-                title="Решить запрос"
-                description="Можете присвоить запросу категории"
+                title={ChoresLsi.solveChore[locale]}
+                description={ChoresLsi.solveChoreDesc[locale]}
                 setFormOpened={setSolveFormOpened}
                 formOpened={solveFormOpened}
             >
@@ -99,36 +100,19 @@ const ChoreComponent: React.FC<ChoreComponentProps> = ({ chore, currUser, mutate
                                         <div className="mr-2 h-5 w-5">
                                             <ChoreTypeIcon type={t} />
                                         </div>
-                                        {ChoreService.formatTypeName(t)}
+                                        {ChoresService.formatTypeName(t)}
                                     </div>
                                 }
                             />
                         </li>
                     ))}
                 </ul>
-                <div className="flex gap-x-2 mt-5">
-                    <button
-                        type="button"
-                        disabled={isLoading}
-                        className={`transition disabled:w-full disabled:cursor-default disabled:hover:bg-blue-100 py-2 px-4 select-none text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500`}
-                        onClick={handleSolve}
-                    >
-                        {!isLoading && 'Подтвердить решение'}
-                        <BarLoader
-                            css="display: block; margin: 0 auto; padding: 8px 0;"
-                            loading={isLoading}
-                            color="rgba(30, 58, 138)"
-                        />
-                    </button>
-                    <button
-                        type="button"
-                        hidden={isLoading}
-                        className={`transition py-2 px-4 disabled:cursor-default disabled:hover:bg-gray-100 select-none text-sm font-medium text-gray-900 bg-gray-100 border border-transparent rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500`}
-                        onClick={() => setSolveFormOpened(false)}
-                    >
-                        Отменить
-                    </button>
-                </div>
+                <DialogButtons
+                    isLoading={isLoading}
+                    saveButtonName={ChoresLsi.confirmSolve[locale]}
+                    onSave={handleSolve}
+                    onCancel={() => setSolveFormOpened(false)}
+                />
             </DialogModal>
             <Link href={`/chores?active=${router.query.active == 'true' || !router.query.active}&choreId=${chore._id}`}>
                 <a
@@ -170,7 +154,7 @@ const ChoreComponent: React.FC<ChoreComponentProps> = ({ chore, currUser, mutate
                                                                 !active ? 'text-blue-500' : 'text-white'
                                                             }`}
                                                         />
-                                                        Взять запрос
+                                                        {ChoresLsi.takeChore[locale]}
                                                     </button>
                                                 )}
                                             </Menu.Item>
@@ -190,7 +174,7 @@ const ChoreComponent: React.FC<ChoreComponentProps> = ({ chore, currUser, mutate
                                                                 !active ? 'text-green-500' : 'text-white'
                                                             }`}
                                                         />
-                                                        Решить запрос
+                                                        {ChoresLsi.solveChore[locale]}
                                                     </button>
                                                 )}
                                             </Menu.Item>
@@ -212,7 +196,7 @@ const ChoreComponent: React.FC<ChoreComponentProps> = ({ chore, currUser, mutate
                                                             !active ? 'text-red-500' : 'text-white'
                                                         }`}
                                                     />
-                                                    Удалить
+                                                    {GlobalLsi.delete[locale]}
                                                 </button>
                                             )}
                                         </Menu.Item>
@@ -238,14 +222,19 @@ const ChoreComponent: React.FC<ChoreComponentProps> = ({ chore, currUser, mutate
                         {chore.creator.department && (
                             <p className="text-sm">
                                 {chore.creator.department.name},&nbsp;
-                                {chore.creator.department.address || 'адрес не указан'}
+                                {chore.creator.department.address || GlobalLsi.noAdress[locale]}
                             </p>
                         )}
-                        <p className="text-sm">Комната: {chore.creator.room || 'не указана'}</p>
                         <p className="text-sm">
-                            Телефон: {UsersService.formatMobile(chore.creator.details?.mobile) || 'не указан'}
+                            {GlobalLsi.room[locale]}:{' '}
+                            {chore.creator.room || GlobalLsi.notSpecified[locale].toLowerCase()}
                         </p>
-                        <p className="text-gray-600 pt-2">{chore.details || 'Описания нет'}</p>
+                        <p className="text-sm">
+                            {GlobalLsi.phone[locale]}:{' '}
+                            {UsersService.formatMobile(chore.creator.details?.mobile) ||
+                                GlobalLsi.notSpecified[locale].toLowerCase()}
+                        </p>
+                        <p className="text-gray-600 pt-2">{chore.details || GlobalLsi.noDesc[locale]}</p>
                     </div>
                 </a>
             </Link>

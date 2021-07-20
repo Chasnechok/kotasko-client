@@ -1,15 +1,19 @@
 import { Dispatch, SetStateAction, useState, useEffect, MouseEvent } from 'react'
-import BarLoader from 'react-spinners/BarLoader'
-import IUser, { UserRoleTypes } from '../../../models/user'
+import IUser, { UserRoleTypes } from '@models/user'
 import fileSize from 'filesize'
 import { ClipboardCopyIcon } from '@heroicons/react/outline'
-import SwitchGroup from '../../switch'
-import ButtonCountdown from '../../button-countdown'
-import DialogModal from '../../dialog-modal'
-import Input from '../../input'
+import SwitchGroup from '@components/switch'
+import ButtonCountdown from '@components/button-countdown'
+import DialogModal, { DialogButtons } from '@components/dialog-modal'
+import Input from '@components/input'
 import UserStructures from './user-structure-select'
-import IDepartment from '../../../models/department'
-import UsersService from '../../../services/users.service'
+import IDepartment from '@models/department'
+import UsersService from '@services/users.service'
+import useLocale from '@hooks/useLocale'
+import UserEditLsi from '@lsi/admin/user-edit.lsi'
+import GlobalLsi from '@lsi/global.lsi'
+import UserCreateLsi from '@lsi/admin/user-create.lsi'
+import AdminLsi from '@lsi/admin/index.lsi'
 
 interface UserEditFormProps {
     formOpened: boolean
@@ -25,6 +29,7 @@ const UserEditForm: React.FC<UserEditFormProps> = ({ formOpened, setFormOpened, 
     const [removeTriggered, setRemoveTriggered] = useState(false)
     const [resetTriggered, setResetTriggered] = useState(false)
     const [structureChoose, setStructureChoose] = useState(false)
+    const { locale } = useLocale()
 
     useEffect(() => {
         if (user && formOpened) {
@@ -81,27 +86,25 @@ const UserEditForm: React.FC<UserEditFormProps> = ({ formOpened, setFormOpened, 
 
     function getOtp(user: IUser): string {
         if (!user) return ''
-        return user.password || 'Зашифрован в базе'
+        return user.password || UserEditLsi.passwordEncrypted[locale]
     }
 
     return (
         <DialogModal
             formOpened={formOpened}
             setFormOpened={setFormOpened}
-            title="Редактировать пользователя"
+            title={UserEditLsi.title[locale]}
             maxWidth="max-w-2xl"
         >
             {user && adminUser._id === user._id && (
-                <p className="pt-1 select-none text-sm text-red-500 underlinem">
-                    Внимание: это ваш профиль, осторожно при редактировании!
-                </p>
+                <p className="pt-1 select-none text-sm text-red-500 underlinem">{UserEditLsi.warningSelf[locale]}</p>
             )}
             {!structureChoose && (
                 <div className="block md:flex gap-x-6">
                     <form className="py-3 flex-1">
                         <div className="flex flex-col mb-3 ">
                             <Input
-                                label="Имя"
+                                label={GlobalLsi.firstName[locale]}
                                 id="firstName"
                                 required
                                 value={targetUser ? targetUser.details.firstName : ''}
@@ -119,7 +122,7 @@ const UserEditForm: React.FC<UserEditFormProps> = ({ formOpened, setFormOpened, 
                         </div>
                         <div className="flex flex-col mb-3 ">
                             <Input
-                                label="Фамилия"
+                                label={GlobalLsi.lastName[locale]}
                                 id="lastName"
                                 required
                                 value={targetUser ? targetUser.details.lastName : ''}
@@ -145,7 +148,7 @@ const UserEditForm: React.FC<UserEditFormProps> = ({ formOpened, setFormOpened, 
                                         quota: !value ? -1 : u.quota !== -1 ? u.quota : 524288000,
                                     }))
                                 }
-                                label="Квота на файлы"
+                                label={UserCreateLsi.quota[locale]}
                                 required
                             />
                             <input
@@ -169,7 +172,7 @@ const UserEditForm: React.FC<UserEditFormProps> = ({ formOpened, setFormOpened, 
                         </div>
                         <div className="flex flex-col mb-3 ">
                             <Input
-                                label="Телефон"
+                                label={GlobalLsi.phone[locale]}
                                 id="mobile"
                                 value={
                                     targetUser
@@ -194,7 +197,7 @@ const UserEditForm: React.FC<UserEditFormProps> = ({ formOpened, setFormOpened, 
                             />
                         </div>
                         <div className="flex flex-col mb-3 ">
-                            <p className="select-none">Логин</p>
+                            <p className="select-none">{GlobalLsi.login[locale]}</p>
                             <div className="relative">
                                 <input
                                     value={targetUser ? targetUser.login : ''}
@@ -208,7 +211,7 @@ const UserEditForm: React.FC<UserEditFormProps> = ({ formOpened, setFormOpened, 
                             </div>
                         </div>
                         <div className="flex flex-col mb-3 ">
-                            <p className="select-none">Пароль</p>
+                            <p className="select-none">{GlobalLsi.password[locale]}</p>
                             <div className="relative">
                                 <input
                                     value={getOtp(targetUser)}
@@ -228,7 +231,7 @@ const UserEditForm: React.FC<UserEditFormProps> = ({ formOpened, setFormOpened, 
                     </form>
                     <div className="flex-1 py-3">
                         <fieldset className="flex flex-col mb-3 border border-gray-900 rounded-md py-2 px-1">
-                            <legend className="text-gray-900 px-2 select-none">Роли пользователя</legend>
+                            <legend className="text-gray-900 px-2 select-none">{UserEditLsi.userRoles[locale]}</legend>
                             <ul className="px-2">
                                 {Object.values(UserRoleTypes).map((role) => (
                                     <li key={role}>
@@ -244,21 +247,21 @@ const UserEditForm: React.FC<UserEditFormProps> = ({ formOpened, setFormOpened, 
                         </fieldset>
 
                         <fieldset className="flex flex-col mb-3 border border-gray-900 rounded-md py-2 px-2">
-                            <legend className="text-gray-900 px-2 select-none">Структура</legend>
+                            <legend className="text-gray-900 px-2 select-none">{AdminLsi.structure[locale]}</legend>
                             <button
                                 style={{ maxWidth: '282px' }}
                                 onClick={() => setStructureChoose(true)}
                                 className="px-4 w-full overflow-hidden md:truncate mx-auto select-none py-2 text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
                             >
-                                {selectedDep?.name || 'Установить структуру'}
+                                {selectedDep?.name || UserEditLsi.setStructure[locale]}
                             </button>
                         </fieldset>
 
                         <fieldset className="border rounded-md border-red-900 p-2">
-                            <legend className="text-red-900 px-2 select-none">Зона невозврата</legend>
+                            <legend className="text-red-900 px-2 select-none">{GlobalLsi.dangerZone[locale]}</legend>
                             <ButtonCountdown
                                 countdown={3500}
-                                label="Удалить"
+                                label={GlobalLsi.delete[locale]}
                                 onFire={handleRemoveUser}
                                 triggered={removeTriggered}
                                 setTriggered={setRemoveTriggered}
@@ -267,7 +270,7 @@ const UserEditForm: React.FC<UserEditFormProps> = ({ formOpened, setFormOpened, 
                             />
                             <ButtonCountdown
                                 countdown={3500}
-                                label="Сбросить пароль"
+                                label={UserEditLsi.resetPassword[locale]}
                                 onFire={handleResetUser}
                                 triggered={resetTriggered}
                                 setTriggered={setResetTriggered}
@@ -284,31 +287,14 @@ const UserEditForm: React.FC<UserEditFormProps> = ({ formOpened, setFormOpened, 
                     <UserStructures setStructure={setSelectedDep} initial={selectedDep} />
                 </div>
             )}
-            <div className="mt-4 flex justify-center sm:block">
-                <button
-                    disabled={
-                        !targetUser || targetUser.details.firstName.length < 3 || targetUser.details.lastName.length < 3
-                    }
-                    type="button"
-                    className={`transition  ${
-                        isLoading ? 'pointer-events-none py-4 w-full' : 'py-2 '
-                    } px-4 select-none text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500
-                                    disabled:cursor-default disabled:text-gray-900 disabled:bg-gray-100`}
-                    onClick={structureChoose ? handleDepartmentChange : handleUpdate}
-                >
-                    {!isLoading && 'Сохранить'}
-                    <BarLoader css="display: block; margin: 0 auto;" loading={isLoading} color="rgba(30, 58, 138)" />
-                </button>
-                {!isLoading && (
-                    <button
-                        type="button"
-                        className="px-4 ml-2 select-none py-2 text-sm font-medium text-gray-900 bg-gray-100 border border-transparent rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
-                        onClick={structureChoose ? () => setStructureChoose(false) : () => setFormOpened(false)}
-                    >
-                        {structureChoose ? 'Назад' : 'Отменить'}
-                    </button>
-                )}
-            </div>
+            <DialogButtons
+                onSave={structureChoose ? handleDepartmentChange : handleUpdate}
+                saveDisabled={
+                    !targetUser || targetUser.details.firstName.length < 3 || targetUser.details.lastName.length < 3
+                }
+                isLoading={isLoading}
+                onCancel={structureChoose ? () => setStructureChoose(false) : () => setFormOpened(false)}
+            />
         </DialogModal>
     )
 }

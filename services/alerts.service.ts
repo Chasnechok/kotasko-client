@@ -1,12 +1,13 @@
-import IAlert from '../components/alerts/alert.type'
-import { addAlert, removeAlert } from '../components/alerts/alerts.slice'
+import IAlert from '@models/alert.model'
+import { addAlert, removeAlert } from '@components/alerts/alerts.slice'
 import { store } from '../redux.store'
 import { AxiosError } from 'axios'
-
+import Router from 'next/router'
+import AlertsLsi from '@lsi/alerts/index.lsi'
 export class AlertsService {
     static addAlert(alert: Partial<IAlert>) {
         const toCreate: IAlert = {
-            content: alert.content || 'Произошла неизвестная ошибка',
+            content: alert.content || AlertsLsi.unknown[Router.locale],
             closeAfterMS: alert.closeAfterMS || 4500,
             theme: alert.theme || 'info',
         }
@@ -19,20 +20,20 @@ export class AlertsService {
 
     static alertFromError(error: AxiosError, content?: string) {
         if (!error?.response?.status) {
-            return this.addAlert(new Alert(content || 'Произошла неизвестная ошибка', 'danger'))
+            return this.addAlert(new Alert(content || AlertsLsi.unknown[Router.locale], 'danger'))
         }
         let alert: IAlert
         switch (error.response.status) {
             case 400:
-                alert = new Alert(content || 'Ошибка валидации данных', 'danger')
+                alert = new Alert(content || AlertsLsi[400][Router.locale], 'danger')
                 break
             case 401:
             case 403:
-                alert = new Alert(content || 'Нет доступа', 'danger')
+                alert = new Alert(content || AlertsLsi[401][Router.locale], 'danger')
                 break
             case 500:
             default:
-                alert = new Alert(content || 'Ошибка сервера, попробуйте позже', 'danger')
+                alert = new Alert(content || AlertsLsi[500][Router.locale], 'danger')
                 break
         }
         this.addAlert(alert)

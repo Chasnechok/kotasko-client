@@ -4,8 +4,10 @@ import Notification from './notification'
 import Bell from './bell'
 import { EyeIcon } from '@heroicons/react/solid'
 import { useEffect } from 'react'
-import { useNotifications } from '../../hooks/useNotifications'
-import IUser from '../../models/user'
+import { useNotifications } from '@hooks/useNotifications'
+import IUser from '@models/user'
+import useLocale from '@hooks/useLocale'
+import NotificationsLsi from '@lsi/notifications/index.lsi'
 
 interface NotificationsProps {
     currUser: IUser
@@ -15,6 +17,7 @@ const Notifications: React.FC<NotificationsProps> = ({ currUser }) => {
     const { data: notifications } = useNotifications()
     const hasNew = notifications && notifications.some((nf) => !nf.isSeen)
     const newNfs = hasNew && notifications.filter((nf) => !nf.isSeen)
+    const { locale } = useLocale()
 
     useEffect(() => {
         let interval
@@ -25,7 +28,7 @@ const Notifications: React.FC<NotificationsProps> = ({ currUser }) => {
             sound.play().catch(() => {
                 console.log('Sound will be played once user interacts with the page')
             })
-            document.title = `Уведомления: ${newNfs.length} | ` + title
+            document.title = `${NotificationsLsi.notifications[locale]}: ${newNfs.length} | ` + title
             interval = setInterval(() => {
                 sound.play().catch(() => {
                     console.log('Sound will be played once user interacts with the page')
@@ -70,11 +73,11 @@ const Notifications: React.FC<NotificationsProps> = ({ currUser }) => {
                             <Popover.Panel className="absolute w-screen max-w-sm px-4 mt-3 transform -translate-x-1/2 md:-translate-x-full left-1/2 sm:px-0 lg:max-w-md">
                                 <div className="overflow-hidden bg-white p-5 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                                     <h3 className="text-lg px-2 font-medium leading-6 text-gray-900 select-none">
-                                        Ваши уведомления
+                                        {NotificationsLsi.yourNfs[locale]}
                                     </h3>
                                     {hasNew && (
                                         <p className="px-2 flex items-center text-gray-500 pt-1 text-sm select-none gap-x-1">
-                                            <EyeIcon className="h-5  " /> - прочитанные уведомления
+                                            <EyeIcon className="h-5  " /> - {NotificationsLsi.read[locale]}
                                         </p>
                                     )}
 
@@ -88,7 +91,7 @@ const Notifications: React.FC<NotificationsProps> = ({ currUser }) => {
                                         )}
                                         {(!notifications || !notifications.length) && (
                                             <div className="py-2 px-2 select-none">
-                                                <p>У вас нет новых уведомлений</p>
+                                                <p> {NotificationsLsi.noNfs[locale]}</p>
                                             </div>
                                         )}
                                     </div>

@@ -1,8 +1,10 @@
 import $api from '../http'
-import IFile from '../models/file'
-import ITask from '../models/task'
-import IUser from '../models/user'
+import IFile from '@models/file'
+import ITask from '@models/task'
+import IUser from '@models/user'
 import { AlertsService } from './alerts.service'
+import router from 'next/router'
+import UploadFormLsi from '@lsi/files/upload-form.lsi'
 
 export default class FilesService {
     static async uploadFiles(files: File[], shareWith?: IUser[], linkedTasks?: ITask[]) {
@@ -13,7 +15,7 @@ export default class FilesService {
             if (linkedTasks) linkedTasks.forEach((t) => dtoIn.append('linkedTasks', t._id))
             files.forEach((vf) => dtoIn.append('files', vf))
             const uploaded = await $api.post<IFile[]>('/files/upload', dtoIn)
-            AlertsService.addAlert({ content: 'Файл(ы) успешно загружены на сервер', theme: 'success' })
+            AlertsService.addAlert({ content: UploadFormLsi.onUpload[router.locale], theme: 'success' })
             return uploaded.data
         } catch (error) {
             AlertsService.alertFromError(error)
@@ -26,7 +28,7 @@ export default class FilesService {
                 fileId: file._id,
                 userIds: shareWith.map((u) => u._id),
             })
-            AlertsService.addAlert({ content: 'Права доступа к файлу обновлены', theme: 'success' })
+            AlertsService.addAlert({ content: UploadFormLsi.onAccessChange[router.locale], theme: 'success' })
         } catch (error) {
             AlertsService.alertFromError(error)
         }
@@ -35,7 +37,7 @@ export default class FilesService {
     static async deleteFile(file: IFile) {
         try {
             await $api.delete(`/files?fileId=${file._id}`)
-            AlertsService.addAlert({ content: 'Файл удален', theme: 'success' })
+            AlertsService.addAlert({ content: UploadFormLsi.onDelete[router.locale], theme: 'info' })
         } catch (error) {
             AlertsService.alertFromError(error)
         }

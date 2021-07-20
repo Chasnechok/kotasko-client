@@ -1,18 +1,17 @@
 import Head from 'next/head'
-import $api from '../../http'
 import formatReqCookies from '../../http/cookie'
-import Layout from '../../components/_layout'
+import Layout from '@components/_layout'
 import React, { Fragment, useState } from 'react'
-import Lsi from '../../lsi/files-page.lst'
-import ModeSelector from '../../components/filesPage/mode-selector'
+import Lsi from '@lsi/files/index.lsi'
 import { useRouter } from 'next/router'
-import DragArea from '../../components/filesPage/dragarea'
-import UploadForm from '../../components/filesPage/upload-form'
-import IUser, { UserStatesTypes } from '../../models/user'
-import InfiniteList from '../../components/infinite-list'
-import IFile from '../../models/file'
-import FileComponent from '../../components/filesPage/file'
+import DragArea from '@components/filesPage/dragarea'
+import UploadForm from '@components/filesPage/upload-form'
+import IUser, { UserStatesTypes } from '@models/user'
+import InfiniteList from '@components/infinite-list'
+import IFile from '@models/file'
+import FileComponent from '@components/filesPage/file'
 import axios from 'axios'
+import Listbox from '@components/listbox'
 interface HomePageProps {
     userFromSession: IUser
     // force rerender when state changes
@@ -23,25 +22,48 @@ export let MUTATE_FILE_LIST
 const Home: React.FC<HomePageProps> = ({ userFromSession, userState }) => {
     const [userInputFiles, setUserInputFiles] = useState<FileList>()
     const router = useRouter()
-    const showShared = router.query.hasOwnProperty('shared')
+    const showShared = router.query.shared == 'true'
+    const locale = router.locale
 
     function shouldRender(file: IFile) {
         if (!file) return false
-        if (showShared) return file.shared.some((u) => u._id === userFromSession._id)
-        return file.owner._id === userFromSession._id
+        if (showShared) return file.shared?.some((u) => u._id === userFromSession._id)
+        return file.owner?._id === userFromSession._id
     }
+
+    function setShowShared(v: boolean) {
+        router.query.shared = v.toString()
+        router.push({ pathname: router.pathname, query: router.query }, null, { shallow: true })
+    }
+
+    const options = [
+        {
+            label: Lsi.yourFiles[locale],
+            value: false,
+        },
+        {
+            label: Lsi.sharedWithYou[locale],
+            value: true,
+        },
+    ]
 
     return (
         <Layout userFromSession={userFromSession}>
-            {(language, user) => (
+            {(user) => (
                 <Fragment>
                     <Head>
-                        <title>Kotasko | {Lsi.pageName[language]}</title>
+                        <title>Kotasko | {Lsi.pageName[locale]}</title>
                         <link rel="icon" href="/favicon.ico" />
                     </Head>
                     {user && (
                         <Fragment>
-                            <ModeSelector />
+                            <Listbox
+                                className="max-w-2xs mx-auto md:mx-0"
+                                options={options}
+                                value={showShared}
+                                setValue={setShowShared}
+                            />
+
                             <section className="h-5/6">
                                 {!showShared && (
                                     <div className="relative h-12 mt-8 mb-3">

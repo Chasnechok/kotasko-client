@@ -2,9 +2,8 @@ import { Fragment, ReactChild, ReactElement, FC, useState, useRef, useCallback }
 import Link from 'next/link'
 import $api from '../http'
 import { useRouter } from 'next/router'
-import useLsi from '../hooks/useLsi'
-import LanguageSelector from './layout/language-selector'
-import Lsi from '../lsi/layout.lsi'
+import GlobalLsi from '@lsi/global.lsi'
+import Lsi from '@lsi/layout/index.lsi'
 import Logo from './logo'
 import MenuIcon from './layout/meni-icon'
 import BarLoader from 'react-spinners/BarLoader'
@@ -16,12 +15,15 @@ import {
     DesktopComputerIcon,
     ChipIcon,
 } from '@heroicons/react/outline'
-import { useUser } from '../hooks/useFetchCollection'
-import IUser, { UserRoleTypes, UserStatesTypes } from '../models/user'
+import { useUser } from '@hooks/useFetchCollection'
+import IUser, { UserRoleTypes, UserStatesTypes } from '@models/user'
 import Notifications from './notifications'
 import FinishReg from './layout/finish-reg'
 import Head from 'next/head'
 import AlertsList from './alerts/alerts-list'
+import SettingsForm from './layout/settings-form'
+import UsersService from '@services/users.service'
+import useLocale from '@hooks/useLocale'
 
 type Renderable = ReactChild | Renderable[]
 
@@ -31,14 +33,15 @@ type FC_CustomChildren<P = {}> = { [K in keyof FC<P>]: FC<P>[K] } & {
 
 interface LayoutProps {
     userFromSession?: IUser
-    children: (language: string, user: IUser) => Renderable
+    children: (user: IUser) => Renderable
 }
 
 const Layout: FC_CustomChildren<LayoutProps> = ({ children, userFromSession }) => {
     const router = useRouter()
     const currentRoute = router.route
-    const [locale, setLocale] = useLsi()
+    const { locale } = useLocale()
     const [menuOpened, setMenuOpened] = useState(false)
+    const [settingsOpened, setSettingsOpened] = useState(false)
     const overlayRef = useRef<HTMLDivElement>()
     const closeMenu = useCallback(() => {
         setMenuOpened(false)
@@ -79,16 +82,11 @@ const Layout: FC_CustomChildren<LayoutProps> = ({ children, userFromSession }) =
         <Fragment>
             <div className="top-bar flex fixed items-center justify-between shadow-md px-10 py-3 z-20 w-full bg-white md:bg-transparent md:shadow-none">
                 <Logo className="justify-center" />
-
                 <div className="flex gap-x-4 relative items-center">
                     {loading && <BarLoader />}
                     <Notifications currUser={user} />
 
-                    {user && (
-                        <span className="cursor-default hidden md:inline">
-                            {user.details.firstName + ' ' + user.details.lastName}
-                        </span>
-                    )}
+                    {user && <span className="cursor-default hidden md:inline">{UsersService.formatName(user)}</span>}
                 </div>
                 <MenuIcon menuOpened={menuOpened} handleMenu={handleMenu} />
             </div>
@@ -154,7 +152,7 @@ const Layout: FC_CustomChildren<LayoutProps> = ({ children, userFromSession }) =
                 </ul>
                 <ul>
                     <li
-                        onClick={() => alert('В разработке')}
+                        onClick={() => setSettingsOpened(true)}
                         className="flex text-gray-400 py-3 cursor-pointer gap-x-2 px-10 border-transparent rounded-l-sm hover:border-blue-600 hover:text-gray-900 border-l-4"
                     >
                         <CogIcon className="w-6 h-6" />
@@ -169,12 +167,7 @@ const Layout: FC_CustomChildren<LayoutProps> = ({ children, userFromSession }) =
                     </li>
                 </ul>
             </nav>
-            {/* <div style={{ width: '9rem' }} className="mx-auto">
-                        <LanguageSelector
-                            language={locale}
-                            setLanguage={setLocale}
-                        />
-                    </div> */}
+
             {user && user.state == UserStatesTypes.CREATED && (
                 <Fragment>
                     <Head>
@@ -192,6 +185,7 @@ const Layout: FC_CustomChildren<LayoutProps> = ({ children, userFromSession }) =
 
             <div ref={overlayRef} className="absolute md:hidden w-screen h-screen left-0"></div>
             <AlertsList />
+            <SettingsForm currUser={user} opened={settingsOpened} setOpened={setSettingsOpened} />
             <main
                 className={`md:px-7 overflow-auto relative flex-1 pt-16 filter md:filter-none  ${
                     menuOpened
@@ -199,7 +193,7 @@ const Layout: FC_CustomChildren<LayoutProps> = ({ children, userFromSession }) =
                         : 'bg-gray-100'
                 } `}
             >
-                {user && user.state === UserStatesTypes.ACTIVE && children(locale, user)}
+                {user && user.state === UserStatesTypes.ACTIVE && children(user)}
             </main>
         </Fragment>
     )

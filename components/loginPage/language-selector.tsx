@@ -1,21 +1,25 @@
-import LsiComponent from '../../models/lsi-component'
+import useLocale from '@hooks/useLocale'
 
-export interface LanguageSelectorProps extends LsiComponent {
-    onChange: () => void
+interface LanguageSelectorProps {
     classNames?: string
 }
 
-const LanguageSelector: React.FC<LanguageSelectorProps> = ({
-    language,
-    onChange,
-    classNames,
-}) => {
+const LanguageSelector: React.FC<LanguageSelectorProps> = ({ classNames }) => {
+    const { locale, setLocale } = useLocale()
+
+    function setOppositeLocale() {
+        if (['ru', 'ua'].includes(locale)) {
+            return setLocale(locale == 'ru' ? 'ua' : 'ru')
+        }
+        setLocale('ru')
+    }
+
     return (
         <a
-            onClick={onChange}
+            onClick={setOppositeLocale}
             className={`underline cursor-pointer text-gray-500 hover:text-gray-400 ${classNames}`}
         >
-            {language === 'ru' ? 'UA' : 'RU'}
+            {locale === 'ru' ? 'UA' : 'RU'}
         </a>
     )
 }

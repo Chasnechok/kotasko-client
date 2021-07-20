@@ -1,14 +1,17 @@
-import IFile from '../../models/file'
+import IFile from '@models/file'
 import { DownloadIcon, TrashIcon, ShareIcon } from '@heroicons/react/solid'
 import { Fragment, useState, useEffect } from 'react'
 import downloadFile from '../../http/download-file'
 import filesize from 'filesize'
 import FileIcon from './file-icon'
 import ShareForm from './share-form'
-import IUser from '../../models/user'
-import FilesService from '../../services/files.service'
-import { MUTATE_FILE_LIST as mutateList } from '../../pages/files'
-import UsersService from '../../services/users.service'
+import IUser from '@models/user'
+import FilesService from '@services/files.service'
+import { MUTATE_FILE_LIST as mutateList } from '@pages/files'
+import UsersService from '@services/users.service'
+import FilesLsi from '@lsi/files/index.lsi'
+import useLocale from '@hooks/useLocale'
+import GlobalLsi from '@lsi/global.lsi'
 
 interface FileComponentProps {
     file: IFile
@@ -40,6 +43,8 @@ const FileComponent: React.FC<FileComponentProps> = ({ file, user }) => {
         return a.toLocaleString()
     }
 
+    const { locale } = useLocale()
+
     return (
         <div
             className={`w-full ml-1 bg-white relative flex items-center overflow-hidden justify-between cursor-default my-3 py-5 px-5 lg:px-10 rounded-md shadow max-h-60 focus:outline-none sm:text-sm lg:hover:shadow-md`}
@@ -62,11 +67,15 @@ const FileComponent: React.FC<FileComponentProps> = ({ file, user }) => {
                     >
                         {file.originalname}
                     </h1>
-                    <h2 className="text-xs md:text-sm lg:text-base">Размер: {filesize(file.size)}</h2>
-                    <h2 className="hidden md:block">Загружено: {uploadedDate()}</h2>
+                    <h2 className="text-xs md:text-sm lg:text-base">
+                        {FilesLsi.size[locale]}: {filesize(file.size)}
+                    </h2>
+                    <h2 className="hidden md:block">
+                        {FilesLsi.uploaded[locale]}: {uploadedDate()}
+                    </h2>
                     {user._id !== file.owner?._id && (
                         <h2 className="text-xs md:text-sm lg:text-base">
-                            Поделился: {UsersService.formatName(file.owner)}
+                            {FilesLsi.shared[locale]}: {UsersService.formatName(file.owner)}
                         </h2>
                     )}
                 </div>
@@ -78,7 +87,7 @@ const FileComponent: React.FC<FileComponentProps> = ({ file, user }) => {
                         deleteTriggered ? 'hidden' : 'block'
                     } md:p-2 group flex items-center hover:text-blue-600 cursor-pointer`}
                 >
-                    <span className="hidden md:inline">Скачать</span>
+                    <span className="hidden md:inline">{FilesLsi.download[locale]}</span>
                     <DownloadIcon className="h-5 md:h-6 md:ml-2 transform group-hover:translate-y-1 transition-all duration-50 group-active:translate-y-2" />
                 </div>
                 {isOwner && (
@@ -97,12 +106,7 @@ const FileComponent: React.FC<FileComponentProps> = ({ file, user }) => {
                                     : ''
                             } cursor-pointer`}
                         >
-                            {deleteTriggered && (
-                                <>
-                                    <span>Отменить</span>
-                                    <span className="hidden md:inline">&nbsp;удаление</span>
-                                </>
-                            )}
+                            {deleteTriggered && <span>{GlobalLsi.cancel[locale]}</span>}
                             {!deleteTriggered && (
                                 <TrashIcon className={`h-5 transition-colors text-gray-400 hover:text-red-500`} />
                             )}

@@ -1,12 +1,14 @@
 import { mutate } from 'swr'
 import $api from '../http'
-import IDepartment from '../models/department'
-import IUser, { UserRoleTypes } from '../models/user'
+import IDepartment from '@models/department'
+import IUser, { UserRoleTypes } from '@models/user'
 import { AlertsService } from './alerts.service'
+import Router from 'next/router'
+import UserCreateLsi from '@lsi/admin/user-create.lsi'
 
 export default class UsersService {
     static formatName(user: IUser) {
-        if (!user || !user.details) return 'Неизвестный'
+        if (!user || !user.details) return UserCreateLsi.userUnknown[Router.locale]
         return user.details.firstName + ' ' + user.details.lastName
     }
     static async register(login, firstName, lastName, quota) {
@@ -27,7 +29,7 @@ export default class UsersService {
                 },
                 false
             )
-            AlertsService.addAlert({ content: 'Пользователь успешно создан', theme: 'success' })
+            AlertsService.addAlert({ content: UserCreateLsi.onSuccess[Router.locale], theme: 'success' })
             return created.data
         } catch (error) {
             AlertsService.alertFromError(error)
@@ -48,7 +50,7 @@ export default class UsersService {
                 },
                 false
             )
-            AlertsService.addAlert({ content: 'Пользователь удален', theme: 'info' })
+            AlertsService.addAlert({ content: UserCreateLsi.onDelete[Router.locale], theme: 'info' })
         } catch (error) {
             AlertsService.alertFromError(error)
         }
@@ -71,7 +73,7 @@ export default class UsersService {
                 false
             )
             AlertsService.addAlert({
-                content: 'Пароль сброшен, активные сессии пользователя удалены',
+                content: UserCreateLsi.onReset[Router.locale],
                 theme: 'success',
             })
 
@@ -102,7 +104,7 @@ export default class UsersService {
                 false
             )
             AlertsService.addAlert({
-                content: 'Структуры пользователя обновлены',
+                content: UserCreateLsi.onDepChange[Router.locale],
                 theme: 'success',
             })
 
@@ -132,7 +134,7 @@ export default class UsersService {
                 false
             )
             AlertsService.addAlert({
-                content: 'Пользователь успешно обновлен',
+                content: UserCreateLsi.onUpdate[Router.locale],
                 theme: 'success',
             })
             return updated.data
@@ -148,7 +150,7 @@ export default class UsersService {
                 '/auth/finishRegistartion',
                 mobile.length == 13 ? Object.assign(dtoIn, { mobile }) : dtoIn
             )
-            AlertsService.addAlert({ content: 'Регистрация успешно завершена', theme: 'success' })
+            AlertsService.addAlert({ content: UserCreateLsi.onReg[Router.locale], theme: 'success' })
             return updated.data
         } catch (error) {
             AlertsService.alertFromError(error)
@@ -165,13 +167,13 @@ export default class UsersService {
     static getRoleName(roleType: UserRoleTypes): string {
         switch (roleType) {
             case UserRoleTypes.ADMIN:
-                return 'Администратор'
+                return UserCreateLsi.typeAdmin[Router.locale]
             case UserRoleTypes.REVISOR:
-                return 'Ревизор'
+                return UserCreateLsi.typeRevisor[Router.locale]
             case UserRoleTypes.TECHNICIAN:
-                return 'Техник'
+                return UserCreateLsi.typeTechnician[Router.locale]
             case UserRoleTypes.USER:
-                return 'Пользователь'
+                return UserCreateLsi.typeUser[Router.locale]
         }
     }
 }

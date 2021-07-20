@@ -1,12 +1,14 @@
 import { Dispatch, SetStateAction, useState } from 'react'
-import BarLoader from 'react-spinners/BarLoader'
-import IUser from '../../models/user'
+import IUser from '@models/user'
 import UsersAccess from './users-access'
 import UploadFormFile from './upload-form-file'
-import DialogModal from '../dialog-modal'
-import FilesService from '../../services/files.service'
+import DialogModal, { DialogButtons } from '../dialog-modal'
+import FilesService from '@services/files.service'
 import fileSize from 'filesize'
-import { MUTATE_FILE_LIST as mutateList } from '../../pages/files'
+import { MUTATE_FILE_LIST as mutateList } from '@pages/files'
+import useLocale from '@hooks/useLocale'
+import UploadFormLsi from '@lsi/files/upload-form.lsi'
+import ShareFormLsi from '@lsi/files/share-form.lsi'
 interface UploadFormProps {
     files: FileList
     setFiles: Dispatch<SetStateAction<FileList>>
@@ -16,6 +18,7 @@ interface UploadFormProps {
 const UploadForm: React.FC<UploadFormProps> = ({ files, setFiles, user }) => {
     const [usersAccess, setUsersAccess] = useState<IUser[]>([])
     const [isLoading, setIsLoading] = useState(false)
+    const { locale } = useLocale()
 
     function isExceeded() {
         if (!files || !files.length) return false
@@ -35,11 +38,13 @@ const UploadForm: React.FC<UploadFormProps> = ({ files, setFiles, user }) => {
 
     return (
         <DialogModal
-            title="Загрузка файлов"
+            title={UploadFormLsi.title[locale]}
             description={
                 user.quota !== -1
-                    ? `Ваше хранилище заполнено на ${fileSize(user.spaceUsed)} из ${fileSize(user.quota)}`
-                    : 'Ваше хранилище безлимитно'
+                    ? `${UploadFormLsi.userSpace[locale]} ${fileSize(user.spaceUsed)} ${
+                          UploadFormLsi.outOf[locale]
+                      } ${fileSize(user.quota)}`
+                    : UploadFormLsi.userSpaceUnlimeted[locale]
             }
             setFormOpened={() => null}
             formOpened={files && files.length ? true : false}
@@ -56,44 +61,23 @@ const UploadForm: React.FC<UploadFormProps> = ({ files, setFiles, user }) => {
                 <h3 className="text-lg font-medium leading-6 text-gray-900 select-none">Доступ к файлу</h3>
                 <p className="pt-1 text-sm text-gray-500 select-none">
                     {!usersAccess.length
-                        ? 'Доступ будет только у вас'
-                        : `Доступ будет у вас и еще у ${usersAccess.length}
-                                            ${usersAccess.length == 1 ? ' человека' : 'людей'}`}
+                        ? ShareFormLsi.accessOnlyYou[locale]
+                        : `${ShareFormLsi.accessMultiple[locale]} ${usersAccess.length}`}
                 </p>
                 <div className="">
                     <UsersAccess user={user} usersWithAccess={usersAccess} setUsersAccess={setUsersAccess} />
                 </div>
             </div>
-            <div className="mt-4 flex justify-center sm:block">
-                {files && !isExceeded() && (
-                    <button
-                        type="button"
-                        className={`transition disabled:cursor-default ${
-                            isLoading ? 'pointer-events-none py-4 w-full' : 'py-2 '
-                        } px-4 select-none text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500`}
-                        onClick={handleUploadFiles}
-                    >
-                        {!isLoading && 'Загрузить'}
-                        <BarLoader
-                            css="display: block; margin: 0 auto;"
-                            loading={isLoading}
-                            color="rgba(30, 58, 138)"
-                        />
-                    </button>
-                )}
-                {!isLoading && (
-                    <button
-                        type="button"
-                        className="px-4 ml-2 select-none py-2 text-sm font-medium text-gray-900 bg-gray-100 border border-transparent rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
-                        onClick={() => {
-                            setFiles(null)
-                            setUsersAccess([])
-                        }}
-                    >
-                        Отменить
-                    </button>
-                )}
-            </div>
+            <DialogButtons
+                onCancel={() => {
+                    setFiles(null)
+                    setUsersAccess([])
+                }}
+                isLoading={isLoading}
+                onSave={handleUploadFiles}
+                saveDisabled={!files || isExceeded()}
+                saveButtonName={UploadFormLsi.upload[locale]}
+            />
         </DialogModal>
     )
 }

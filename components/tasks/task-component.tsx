@@ -1,20 +1,22 @@
-import ITask, { TaskStates } from '../../models/task'
+import ITask, { TaskStates } from '@models/task'
 import Link from 'next/link'
 import SimpleSpinner from '../simple-spinner'
 import { useState, Fragment } from 'react'
 import MenuDropdown from '../dropdown'
 import { Menu } from '@headlessui/react'
 import { ThumbDownIcon, TrashIcon, PaperClipIcon, ThumbUpIcon, UserCircleIcon } from '@heroicons/react/outline'
-import IUser from '../../models/user'
+import IUser from '@models/user'
 import ExecutansManageForm from './executans-manage'
-import TasksService from '../../services/tasks.service'
+import TasksService from '@services/tasks.service'
 import { MUTATE_TASK_LIST as mutateList } from '../../pages/tasks'
 import ConfirmDialog from '../confirm-dialog'
-import UsersService from '../../services/users.service'
+import UsersService from '@services/users.service'
 import downloadFile from '../../http/download-file'
 import fileSize from 'filesize'
-import IFile from '../../models/file'
+import IFile from '@models/file'
 import { useRouter } from 'next/router'
+import TasksLsi from '@lsi/tasks/index.lsi'
+import GlobalLsi from '@lsi/global.lsi'
 
 export interface TaskComponentProps {
     task: ITask
@@ -27,6 +29,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
     const [deleteTriggered, setDeleteTriggered] = useState(false)
 
     const router = useRouter()
+    const locale = router.locale
     const isSelected = router.query.taskId === task._id
 
     function isCreator() {
@@ -74,7 +77,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
     }
 
     function executansList(): string {
-        if (!task.assignedTo || !task.assignedTo.length) return 'не назначены'
+        if (!task.assignedTo || !task.assignedTo.length) return TasksLsi.executansNotSet[locale]
         let string = ''
         task.assignedTo.forEach((u, i) => {
             string += i == task.assignedTo.length - 1 ? UsersService.formatName(u) : `${UsersService.formatName(u)}, `
@@ -92,11 +95,11 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
                 onSave={updateExecutans}
             />
             <ConfirmDialog
-                title="Подтвердите удаление"
+                title={TasksLsi.confirmDel[locale]}
                 onFire={deleteTask}
                 opened={deleteTriggered}
                 setOpened={setDeleteTriggered}
-                description={`Вы собираетесь удалить "${task.name}"`}
+                description={`${TasksLsi.confirmDelDesc[locale]} "${task.name}"`}
             />
             <Link replace href={`/tasks?shared=${router.query.shared === 'true'}&taskId=${task._id}`}>
                 <a
@@ -140,10 +143,10 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
                                                     }`}
                                                 />
                                                 {task.state == TaskStates.PENDING_REVIEW
-                                                    ? 'На ревизии'
+                                                    ? TasksLsi.onRevision[locale]
                                                     : task.state == TaskStates.FINISHED
-                                                    ? 'Поручение исполненно'
-                                                    : 'На проверку'}
+                                                    ? TasksLsi.done[locale]
+                                                    : TasksLsi.toRevision[locale]}
                                             </button>
                                         )}
                                     </Menu.Item>
@@ -165,7 +168,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
                                                             !active ? 'text-green-500' : 'text-white'
                                                         }`}
                                                     />
-                                                    Поручение исполненно
+                                                    {TasksLsi.done[locale]}
                                                 </button>
                                             )}
                                         </Menu.Item>
@@ -182,7 +185,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
                                                             !active ? 'text-yellow-500' : 'text-white'
                                                         }`}
                                                     />
-                                                    На доработку
+                                                    {TasksLsi.toCreated[locale]}
                                                 </button>
                                             )}
                                         </Menu.Item>
@@ -205,7 +208,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
                                                             !active ? 'text-gray-500' : 'text-white'
                                                         }`}
                                                     />
-                                                    Исполнители
+                                                    {TasksLsi.executans[locale]}
                                                 </button>
                                             )}
                                         </Menu.Item>
@@ -223,7 +226,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
                                                         !active ? 'text-red-500' : 'text-white'
                                                     }`}
                                                 />
-                                                Удалить
+                                                {GlobalLsi.delete[locale]}
                                             </button>
                                         )}
                                     </Menu.Item>
@@ -246,11 +249,15 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
                     </p>
 
                     <div className="divide-y divide-gray-100">
-                        <p className="text-gray-600 py-2 max-h-40 overflow-y-auto">{task.details || 'Описания нет'}</p>
+                        <p className="text-gray-600 py-2 max-h-40 overflow-y-auto">
+                            {task.details || GlobalLsi.noDesc[locale]}
+                        </p>
                         <p className="text-gray-600 py-2 text-sm">
                             Поручитель: {UsersService.formatName(task.creator)}
                         </p>
-                        <p className="text-gray-600 py-2 text-sm">Исполнители: {executansList()}</p>
+                        <p className="text-gray-600 py-2 text-sm">
+                            {TasksLsi.executans[locale]}: {executansList()}
+                        </p>
                         {task.attachments && (
                             <ul className="py-2 flex gap-2 flex-wrap">
                                 {task.attachments.map((at) => (

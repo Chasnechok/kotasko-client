@@ -6,6 +6,8 @@ import Search, { SearchEntities } from '../search'
 import PuffLoader from 'react-spinners/PuffLoader'
 import { useActiveUsers } from '../../hooks/useFetchCollection'
 import UsersService from '../../services/users.service'
+import GlobalLsi from '@lsi/global.lsi'
+import useLocale from '@hooks/useLocale'
 
 interface UsersAccessProps {
     setUsersAccess: Dispatch<SetStateAction<IUser[]>>
@@ -17,6 +19,7 @@ interface UsersAccessProps {
 const UsersAccess: React.FC<UsersAccessProps> = ({ usersWithAccess, setUsersAccess, user, className }) => {
     const { data: activeUsers, loading } = useActiveUsers()
     const [appUsers, setAppUsers] = useState<IUser[]>([])
+    const { locale } = useLocale()
 
     useEffect(() => {
         if (!loading) {
@@ -88,7 +91,7 @@ const UsersAccess: React.FC<UsersAccessProps> = ({ usersWithAccess, setUsersAcce
                             ))}
                     </ul>
                 ) : (
-                    <p>Ничего не найдено</p>
+                    <p>{GlobalLsi.nothingFound[locale]}</p>
                 )}
             </div>
         </Fragment>

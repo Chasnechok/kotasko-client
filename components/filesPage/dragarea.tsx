@@ -1,3 +1,5 @@
+import useLocale from '@hooks/useLocale'
+import DragAreaLsi from '@lsi/files/dragarea.lsi'
 import { useRef, Fragment, Dispatch, SetStateAction, useEffect } from 'react'
 
 interface DragAreaProps {
@@ -18,6 +20,7 @@ const DragArea: React.FC<DragAreaProps> = ({ setFiles, single, forceRerender }) 
     function handleOnDrop() {
         setFiles(inputRef.current.files)
     }
+    const { locale } = useLocale()
     return (
         <Fragment>
             <div className="border-dashed border-2 group relative focus-within:border-blue-900 hover:border-blue-900 rounded border-gray-400 w-full h-full">
@@ -32,7 +35,7 @@ const DragArea: React.FC<DragAreaProps> = ({ setFiles, single, forceRerender }) 
                     onDrop={handleOnDrop}
                 />
                 <p className="absolute w-full text-center text-gray-400 pointer-events-none cursor-pointer group-focus-within:text-blue-900 group-hover:text-blue-900 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                    {single ? 'Загрузить файл' : 'Загрузить файлы'}
+                    {single ? DragAreaLsi.uploadFile[locale] : DragAreaLsi.uploadFiles[locale]}
                 </p>
             </div>
         </Fragment>

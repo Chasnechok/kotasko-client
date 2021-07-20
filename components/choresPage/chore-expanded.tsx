@@ -1,8 +1,9 @@
 import { DesktopComputerIcon, PlusIcon } from '@heroicons/react/outline'
-import IUser from '../../models/user'
-import { MessagesTypes } from '../../models/message'
+import IUser from '@models/user'
+import { MessagesTypes } from '@models/message'
 import Chat from '../chat'
 import { useRouter } from 'next/router'
+import ChoresLsi from '@lsi/chores/index.lsi'
 
 interface ChoreExpandedProps {
     choreId: string
@@ -11,11 +12,12 @@ interface ChoreExpandedProps {
 
 const ChoreExpanded: React.FC<ChoreExpandedProps> = ({ choreId, user }) => {
     const router = useRouter()
+    const locale = router.locale
 
     if (!choreId) {
         return (
             <div className="hidden lg:flex flex-col items-center opacity-50 select-none mt-10">
-                <span>Выберите запрос</span>
+                <span>{ChoresLsi.pickChore[locale]}</span>
                 <DesktopComputerIcon className="h-20 pt-1" />
             </div>
         )

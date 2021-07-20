@@ -1,12 +1,15 @@
-import { useState, useEffect, SetStateAction, Dispatch } from 'react'
-import INotification, { NotificationsTypes } from '../../models/notification'
+import { useState, useEffect } from 'react'
+import INotification, { NotificationsTypes } from '@models/notification'
 import { ChevronUpIcon, DownloadIcon, EyeIcon } from '@heroicons/react/outline'
 import { Disclosure } from '@headlessui/react'
-import IUser from '../../models/user'
+import IUser from '@models/user'
 import filesize from 'filesize'
 import downloadFile from '../../http/download-file'
 import Link from 'next/link'
-import NotificationsService from '../../services/notifications.service'
+import NotificationsService from '@services/notifications.service'
+import useLocale from '@hooks/useLocale'
+import NotificationsLsi from '@lsi/notifications/index.lsi'
+import UsersService from '@services/users.service'
 
 interface NotificationProps {
     notification: INotification
@@ -15,6 +18,7 @@ interface NotificationProps {
 
 const Notification: React.FC<NotificationProps> = ({ notification, currUser }) => {
     const [opened, setOpened] = useState(false)
+    const { locale } = useLocale()
     useEffect(() => {
         let timer
         if (!notification.isSeen && opened) {
@@ -28,8 +32,7 @@ const Notification: React.FC<NotificationProps> = ({ notification, currUser }) =
     }, [opened, notification])
 
     function formatName(user: IUser): string {
-        if (!user || !user.details) return 'От анонима'
-        return `От: ${user.details.firstName} ${user.details.lastName}`
+        return `${NotificationsLsi.from[locale]}: ${UsersService.formatName(user)}`
     }
     function formatDate(dateString: string): string {
         const d = new Date(dateString)
@@ -40,7 +43,7 @@ const Notification: React.FC<NotificationProps> = ({ notification, currUser }) =
         if (notification.type !== NotificationsTypes.NEW_SHARED_FILE) return null
         return (
             <div className="px-2 py-2 relative rounded-md flex items-center justify-between shadow">
-                <div className="w-2/3 overflow-x-scroll">
+                <div className="w-2/3 overflow-x-auto">
                     <h1 className="text-xs md:text-sm">{notification.referencedFile.originalname}&nbsp;</h1>
                     <span className="hidden md:inline text-xs">
                         |&nbsp;{filesize(notification.referencedFile.size)}
@@ -50,7 +53,7 @@ const Notification: React.FC<NotificationProps> = ({ notification, currUser }) =
                     onClick={() => downloadFile(notification.referencedFile)}
                     className="text-xs cursor-pointer hover:text-blue-600 flex items-center"
                 >
-                    <span className="hidden lg:inline">Скачать</span>
+                    <span className="hidden lg:inline">{NotificationsLsi.download[locale]}</span>
                     <DownloadIcon className="mx-1 h-5" />
                 </span>
             </div>
@@ -69,7 +72,9 @@ const Notification: React.FC<NotificationProps> = ({ notification, currUser }) =
         if (!referencedTask) return null
         return (
             <Link href={`/tasks?shared=${referencedTask.creator?._id !== currUser._id}&taskId=${referencedTask._id}`}>
-                <p className="underline cursor-pointer max-w-full truncate">Задание: {referencedTask.name}</p>
+                <p className="underline cursor-pointer max-w-full truncate">
+                    {NotificationsLsi.task[locale]}: {referencedTask.name}
+                </p>
             </Link>
         )
     }
@@ -96,7 +101,9 @@ const Notification: React.FC<NotificationProps> = ({ notification, currUser }) =
         if (!referencedChore) return null
         return (
             <Link href={`/chores?choreId=${referencedChore._id}`}>
-                <p className="underline cursor-pointer max-w-full truncate">Запрос: {referencedChore.details}</p>
+                <p className="underline cursor-pointer max-w-full truncate">
+                    {NotificationsLsi.chore[locale]}: {referencedChore.details}
+                </p>
             </Link>
         )
     }

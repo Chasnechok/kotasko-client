@@ -1,7 +1,9 @@
 import { PaperClipIcon } from '@heroicons/react/outline'
+import useLocale from '@hooks/useLocale'
+import ChatLsi from '@lsi/chat/index.lsi'
 import { useState } from 'react'
-import { InputAttachments } from '../../models/file'
-import IUser from '../../models/user'
+import { InputAttachments } from '@models/file'
+import IUser from '@models/user'
 import SimpleSpinner from '../simple-spinner'
 import InputAttachmentForm from './input-attachment-form'
 
@@ -16,6 +18,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onMessageInput, attachments, curr
     const [formOpened, setFormOpened] = useState(false)
     const [inputAttachments, setInputAttachments] = useState<InputAttachments>()
     const [loading, setLoading] = useState(false)
+    const { locale } = useLocale()
 
     function countTextAreaRows(): number {
         const lines = message.match(/(\r\n|\r|\n)/g)
@@ -79,7 +82,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onMessageInput, attachments, curr
                 <div className="relative flex-1 flex items-center">
                     <textarea
                         className="resize-none border-gray-200 w-full focus:border-gray-200 bg-gray-50 border-1 shadow-inner rounded-md text-xs sm:text-sm focus:outline-none focus:ring-0 focus:text-gray-700 text-gray-500 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-400"
-                        placeholder="Ваше сообщение"
+                        placeholder={ChatLsi.placeholder[locale]}
                         rows={countTextAreaRows()}
                         role="textbox"
                         value={message}
@@ -97,12 +100,10 @@ const ChatInput: React.FC<ChatInputProps> = ({ onMessageInput, attachments, curr
                     onClick={handleSendMessage}
                     className="disabled:bg-gray-500 disabled:hover:bg-gray-500 disabled:cursor-default text-xs sm:text-sm disabled:focus-visible:ring-0 flex ml-2 bg-blue-500 hover:bg-blue-600 p-2 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-400"
                 >
-                    <span className="text-white">Отправить</span>
+                    <span className="text-white">{ChatLsi.send[locale]}</span>
                 </button>
             </div>
-            <span className="text-gray-500 text-xs select-none leading-none">
-                Enter - Отправить, Ctrl + Enter - новая строка
-            </span>
+            <span className="text-gray-500 text-xs select-none leading-none">{ChatLsi.sendTip[locale]}</span>
         </div>
     )
 }

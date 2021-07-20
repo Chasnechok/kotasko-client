@@ -3,6 +3,7 @@ import IUser from '../../models/user'
 import { MessagesTypes } from '../../models/message'
 import Chat from '../chat'
 import { useRouter } from 'next/router'
+import TasksLsi from '@lsi/tasks/index.lsi'
 
 interface ChoreExpandedProps {
     taskId: string
@@ -11,10 +12,11 @@ interface ChoreExpandedProps {
 
 const TaskExpanded: React.FC<ChoreExpandedProps> = ({ taskId, user }) => {
     const router = useRouter()
+    const locale = router.locale
     if (!taskId) {
         return (
             <div className="hidden lg:flex flex-col items-center opacity-50 select-none mt-10">
-                <span>Выберите задание</span>
+                <span>{TasksLsi.pickTask[locale]}</span>
                 <ClipboardCheckIcon className="h-20 pt-1" />
             </div>
         )

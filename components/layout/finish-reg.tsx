@@ -1,13 +1,13 @@
 import { useRouter } from 'next/router'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { BarLoader } from 'react-spinners'
 import $api from '../../http'
-import IUser from '../../models/user'
-import DialogModal from '../dialog-modal'
+import IUser from '@models/user'
+import DialogModal, { DialogButtons } from '../dialog-modal'
 import Input from '../input'
 import { MutatorCallback } from 'swr/dist/types'
 import UserStructures from '../adminPage/user/user-structure-select'
-import UsersService from '../../services/users.service'
+import UsersService from '@services/users.service'
+import FinishRegLsi from '@lsi/layout/finish-reg.lsi'
 
 interface FinishRegProps {
     formOpened: boolean
@@ -24,6 +24,7 @@ const FinishReg: React.FC<FinishRegProps> = ({ formOpened, setFormOpened, target
     const [room, setRoom] = useState(targetUser.room || '')
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
+    const locale = router.locale
     const [passwordWarning, setPasswordWarning] = useState('')
     const [selectedDep, setSelectedDep] = useState(targetUser.department)
     const [mobile, setMobile] = useState('+380')
@@ -34,10 +35,10 @@ const FinishReg: React.FC<FinishRegProps> = ({ formOpened, setFormOpened, target
     }
 
     function warningPassword(password: string): string {
-        if (password.length < 6) return 'Пароль слишком короткий'
-        if (!password.match(/^(?=.*[A-Z]).{6,}$/)) return 'Хотя бы 1 буква верхнего регистра'
-        if (!password.match(/^(?=.*[a-zA-Z].*[a-zA-Z].*[a-zA-Z]).{6,}$/)) return 'Хотя бы 3 буквы'
-        if (!password.match(/^(?=.*[0-9].*[0-9]).{6,}$/)) return 'Хотя бы 2 цифры'
+        if (password.length < 6) return FinishRegLsi.passwordShort[locale]
+        if (!password.match(/^(?=.*[A-Z]).{6,}$/)) return FinishRegLsi.oneUpper[locale]
+        if (!password.match(/^(?=.*[a-zA-Z].*[a-zA-Z].*[a-zA-Z]).{6,}$/)) return FinishRegLsi.threeLetters[locale]
+        if (!password.match(/^(?=.*[0-9].*[0-9]).{6,}$/)) return FinishRegLsi.twoDigits[locale]
         return ''
     }
 
@@ -76,17 +77,17 @@ const FinishReg: React.FC<FinishRegProps> = ({ formOpened, setFormOpened, target
         <DialogModal
             formOpened={formOpened}
             setFormOpened={setFormOpened}
-            title="Закончите регистрацию"
-            description="Похоже это ваш первый вход - заполните поля ниже"
+            title={FinishRegLsi.title[locale]}
+            description={FinishRegLsi.description[locale]}
             maxWidth="max-w-xl"
         >
             <form className="py-3 relative">
                 <div className="flex flex-col mb-7 relative">
                     <Input
                         id="password"
-                        label="Установите себе пароль"
+                        label={FinishRegLsi.setPassword[locale]}
                         required
-                        placeholder="Минимум 6 символов"
+                        placeholder={FinishRegLsi.passwordPlaceholder[locale]}
                         value={password}
                         onChange={(value) => setPassword(value)}
                     />
@@ -97,7 +98,7 @@ const FinishReg: React.FC<FinishRegProps> = ({ formOpened, setFormOpened, target
                 <div className="flex flex-col mb-7">
                     <Input
                         id="mobile"
-                        label="Укажите контактый номер"
+                        label={FinishRegLsi.setPhone[locale]}
                         value={mobile}
                         onChange={(value) => handleSetMobile(value)}
                     />
@@ -106,40 +107,20 @@ const FinishReg: React.FC<FinishRegProps> = ({ formOpened, setFormOpened, target
                 {selectedDep && (
                     <div className="mb-3 flex flex-col">
                         <Input
-                            label="Номер комнаты в департаменте"
+                            label={FinishRegLsi.roomNumber[locale]}
                             id="roomNumber"
                             value={room}
                             onChange={(value) => setRoom(value)}
                         />
                     </div>
                 )}
-
-                <div className="mt-4 flex justify-center sm:block">
-                    <button
-                        disabled={!!warningPassword(password)}
-                        type="button"
-                        className={`transition disabled:cursor-default ${
-                            isLoading ? 'pointer-events-none py-4 w-full' : 'py-2 '
-                        } px-4 select-none text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500`}
-                        onClick={handleFinishReg}
-                    >
-                        {!isLoading && 'Готово'}
-                        <BarLoader
-                            css="display: block; margin: 0 auto;"
-                            loading={isLoading}
-                            color="rgba(30, 58, 138)"
-                        />
-                    </button>
-                    {!isLoading && (
-                        <button
-                            type="button"
-                            className="px-4 ml-2 select-none py-2 text-sm font-medium text-gray-900 bg-gray-100 border border-transparent rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
-                            onClick={handleLogout}
-                        >
-                            Выйти
-                        </button>
-                    )}
-                </div>
+                <DialogButtons
+                    saveDisabled={!!warningPassword(password)}
+                    saveButtonName={FinishRegLsi.done[locale]}
+                    isLoading={isLoading}
+                    onCancel={handleLogout}
+                    onSave={handleFinishReg}
+                />
             </form>
         </DialogModal>
     )

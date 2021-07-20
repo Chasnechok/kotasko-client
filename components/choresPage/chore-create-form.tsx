@@ -1,9 +1,11 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import DialogModal from '../dialog-modal'
-import BarLoader from 'react-spinners/BarLoader'
-import ChoresService from '../../services/chores.service'
+import DialogModal, { DialogButtons } from '../dialog-modal'
+import ChoresService from '@services/chores.service'
 import Input from '../input'
-import { MUTATE_CHORE_LIST as mutateList } from '../../pages/chores'
+import { MUTATE_CHORE_LIST as mutateList } from '@pages/chores'
+import ChatLsi from '@lsi/chat/index.lsi'
+import ChoreCreateLsi from '@lsi/chores/chore-create.lsi'
+import useLocale from '@hooks/useLocale'
 
 interface ChoreCreateFormProps {
     opened: boolean
@@ -13,6 +15,7 @@ interface ChoreCreateFormProps {
 const ChoreCreateForm: React.FC<ChoreCreateFormProps> = ({ opened, setOpened }) => {
     const [isLoading, setIsLoading] = useState(false)
     const [details, setDetails] = useState('')
+    const { locale } = useLocale()
 
     async function createChore() {
         setIsLoading(true)
@@ -28,14 +31,14 @@ const ChoreCreateForm: React.FC<ChoreCreateFormProps> = ({ opened, setOpened }) 
 
     return (
         <DialogModal
-            title="Запросить сервис"
-            description="Техники вашей организации получат ваши контактные данные и помогут как только смогут"
+            title={ChoreCreateLsi.title[locale]}
+            description={ChoreCreateLsi.description[locale]}
             formOpened={opened}
             setFormOpened={setOpened}
         >
             <div className="mt-1 flex flex-col">
                 <Input
-                    label="Опишите проблему"
+                    label={ChoreCreateLsi.details[locale]}
                     textArea
                     required
                     id="details"
@@ -43,28 +46,13 @@ const ChoreCreateForm: React.FC<ChoreCreateFormProps> = ({ opened, setOpened }) 
                     onChange={(value) => setDetails(value)}
                 />
             </div>
-            <div className="mt-4 flex justify-center sm:block">
-                <button
-                    type="button"
-                    disabled={!details}
-                    className={`transition disabled:bg-gray-100 disabled:text-gray-900 disabled:hover:bg-gray-100 disabled:cursor-default ${
-                        isLoading ? 'pointer-events-none py-4 w-full' : 'py-2 '
-                    } px-4 select-none text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500`}
-                    onClick={createChore}
-                >
-                    {!isLoading && 'Отправить'}
-                    <BarLoader css="display: block; margin: 0 auto;" loading={isLoading} color="rgba(30, 58, 138)" />
-                </button>
-                {!isLoading && (
-                    <button
-                        type="button"
-                        className="px-4 ml-2 select-none py-2 text-sm font-medium text-gray-900 bg-gray-100 border border-transparent rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
-                        onClick={() => setOpened(false)}
-                    >
-                        Отменить
-                    </button>
-                )}
-            </div>
+            <DialogButtons
+                saveDisabled={!details}
+                saveButtonName={ChatLsi.send[locale]}
+                onSave={createChore}
+                onCancel={() => setOpened(false)}
+                isLoading={isLoading}
+            />
         </DialogModal>
     )
 }

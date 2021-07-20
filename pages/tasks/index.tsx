@@ -1,19 +1,19 @@
 import Head from 'next/head'
 import React, { Fragment, useState } from 'react'
-import $api from '../../http'
 import formatReqCookies from '../../http/cookie'
-import Lsi from '../../lsi/tasks/index.lsi'
-import Layout from '../../components/_layout'
-import Listbox from '../../components/listbox'
-import TaskCreateForm from '../../components/tasks/task-create-form/index'
-import InfiniteList from '../../components/infinite-list'
-import IUser from '../../models/user'
-import ITask from '../../models/task'
-import TaskComponent from '../../components/tasks/task-component'
-import TaskExpanded from '../../components/tasks/task-expanded'
+import Lsi from '@lsi/tasks/index.lsi'
+import Layout from '@components/_layout'
+import Listbox from '@components/listbox'
+import TaskCreateForm from '@components/tasks/task-create-form/index'
+import InfiniteList from '@components/infinite-list'
+import IUser from '@models/user'
+import ITask from '@models/task'
+import TaskComponent from '@components/tasks/task-component'
+import TaskExpanded from '@components/tasks/task-expanded'
 import { useRouter } from 'next/router'
 import { PlusIcon } from '@heroicons/react/outline'
 import axios from 'axios'
+import TasksLsi from '@lsi/tasks/index.lsi'
 
 export let MUTATE_TASK_LIST
 
@@ -24,6 +24,7 @@ interface TasksPageProps {
 const TasksPage: React.FC<TasksPageProps> = ({ userFromSession }) => {
     const [createFormOpened, setCreateFormOpened] = useState(false)
     const router = useRouter()
+    const locale = router.locale
     const showShared = router.query.shared == 'true'
     function setShowShared(v: boolean) {
         router.query.shared = v.toString()
@@ -32,26 +33,26 @@ const TasksPage: React.FC<TasksPageProps> = ({ userFromSession }) => {
     const selectedId = router.query.taskId
     const options = [
         {
-            label: 'Созданные вами',
+            label: TasksLsi.yourTasks[locale],
             value: false,
         },
         {
-            label: 'Порученные вам',
+            label: TasksLsi.sharedWithYou[locale],
             value: true,
         },
     ]
 
     function shouldRender(task: ITask) {
         if (!task) return false
-        if (showShared) return task.assignedTo.some((u) => u._id === userFromSession._id)
-        return task.creator._id === userFromSession._id
+        if (showShared) return task.assignedTo?.some((u) => u._id === userFromSession._id)
+        return task.creator?._id === userFromSession._id
     }
     return (
         <Layout userFromSession={userFromSession}>
-            {(language, user) => (
+            {(user) => (
                 <Fragment>
                     <Head>
-                        <title>Kotasko | {Lsi.pageName[language]}</title>
+                        <title>Kotasko | {Lsi.pageName[locale]}</title>
                         <link rel="icon" href="/favicon.ico" />
                     </Head>
 
@@ -78,13 +79,6 @@ const TasksPage: React.FC<TasksPageProps> = ({ userFromSession }) => {
                                 formOpened={createFormOpened}
                                 user={user}
                             />
-                            {/* <button
-                                onClick={() => setCreateFormOpened(true)}
-                                className={`text-white bg-blue-500 z-10 hover:bg-blue-600 focus-visible:ring-blue-500 select-none transform md:transform-none font-medium
-                             bottom-10 left-1/2 -translate-x-1/2 py-4 px-8 md:px-20 fixed lg:px-24 shadow-md rounded-full rounded-tl-none ring-offset-2 focus:outline-none focus:ring`}
-                            >
-                                Создать задание
-                            </button> */}
                             <section className="flex h-5/6 justify-around mt-5">
                                 <div className="flex-1 lg:max-w-2xl">
                                     <InfiniteList<ITask & React.FC>

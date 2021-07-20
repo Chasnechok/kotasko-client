@@ -1,10 +1,12 @@
 import { useState, SetStateAction, Dispatch, useEffect } from 'react'
 import { PuffLoader } from 'react-spinners'
-import { useDepList, useOrgList } from '../../../hooks/useFetchCollection'
-import IDepartment from '../../../models/department'
-import IOrganisation from '../../../models/organisation'
-import Disclosure from '../../disclosure'
-import SwitchGroup from '../../switch'
+import { useDepList, useOrgList } from '@hooks/useFetchCollection'
+import IDepartment from '@models/department'
+import IOrganisation from '@models/organisation'
+import Disclosure from '@components/disclosure'
+import SwitchGroup from '@components/switch'
+import useLocale from '@hooks/useLocale'
+import UserEditLsi from '@lsi/admin/user-edit.lsi'
 
 interface UserDepsProps {
     setStructure: Dispatch<SetStateAction<IDepartment>>
@@ -15,6 +17,7 @@ const UserStructures: React.FC<UserDepsProps> = ({ initial: selectedDep, setStru
     const { loading: orgsLoading, data: orgs } = useOrgList()
     const { loading: depsLoading, data: deps } = useDepList()
     const [selectedOrg, setSelectedOrg] = useState<IOrganisation>(selectedDep?.organisation)
+    const { locale } = useLocale()
 
     useEffect(() => {
         if (selectedDep && selectedDep.organisation?._id !== selectedOrg._id) {
@@ -36,8 +39,8 @@ const UserStructures: React.FC<UserDepsProps> = ({ initial: selectedDep, setStru
 
     return (
         <fieldset className="flex flex-col mb-3 border relative border-gray-900 rounded-md py-2 px-4">
-            <legend className="text-gray-900 px-2 select-none">Структура и департамент</legend>
-            <Disclosure label={selectedOrg ? selectedOrg.name : 'Выберите структуру'}>
+            <legend className="text-gray-900 px-2 select-none">{UserEditLsi.structureAndDep[locale]}</legend>
+            <Disclosure label={selectedOrg ? selectedOrg.name : UserEditLsi.pickStructure[locale]}>
                 <PuffLoader loading={orgsLoading} color="rgb(37, 99, 235)" css="display: block; margin: 0 auto;" />
                 <ul className="max-h-40 overflow-y-auto">
                     {orgs &&
@@ -54,9 +57,11 @@ const UserStructures: React.FC<UserDepsProps> = ({ initial: selectedDep, setStru
                         ))}
                 </ul>
             </Disclosure>
-            <Disclosure label={selectedDep ? selectedDep.name : 'Выберите департамент'}>
+            <Disclosure label={selectedDep ? selectedDep.name : UserEditLsi.pickDep[locale]}>
                 <PuffLoader loading={depsLoading} color="rgb(37, 99, 235)" css="display: block; margin: 0 auto;" />
-                {!selectedOrg && <p className="select-none text-gray-500 text-center">Сперва выберите структуру</p>}
+                {!selectedOrg && (
+                    <p className="select-none text-gray-500 text-center">{UserEditLsi.firstPickStructure[locale]}</p>
+                )}
                 <ul className="max-h-40 overflow-y-auto">
                     {deps &&
                         deps

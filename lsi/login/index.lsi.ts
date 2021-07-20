@@ -1,4 +1,8 @@
-const Lsi = {
+const LoginLsi = {
+    pageName: {
+        ru: 'Вход',
+        ua: 'Вхід',
+    },
     greeting: {
         ru: 'Добро пожаловать!',
         ua: 'Ласкаво просимо!',
@@ -44,4 +48,4 @@ const Lsi = {
         ua: 'Помилка сервера, спробуйте пізніше.',
     },
 }
-export default Lsi
+export default LoginLsi
