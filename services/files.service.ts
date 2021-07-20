@@ -1,4 +1,4 @@
-import $api from '../http'
+import $api, { API_URL } from '../http'
 import IFile from '@models/file'
 import ITask from '@models/task'
 import IUser from '@models/user'
@@ -40,6 +40,20 @@ export default class FilesService {
             AlertsService.addAlert({ content: UploadFormLsi.onDelete[router.locale], theme: 'info' })
         } catch (error) {
             AlertsService.alertFromError(error)
+        }
+    }
+
+    static async downloadFile(file: IFile) {
+        try {
+            await $api.get(`/files/preDownload/${file._id}`)
+            const link = document.createElement('a')
+            link.href = `${API_URL}/files/download/${file._id}`
+            link.setAttribute('download', file.originalname)
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+        } catch (error) {
+            AlertsService.alertFromError(error, UploadFormLsi.onDownloadFailed[router.locale])
         }
     }
 }

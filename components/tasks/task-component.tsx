@@ -11,12 +11,12 @@ import TasksService from '@services/tasks.service'
 import { MUTATE_TASK_LIST as mutateList } from '../../pages/tasks'
 import ConfirmDialog from '../confirm-dialog'
 import UsersService from '@services/users.service'
-import downloadFile from '../../http/download-file'
 import fileSize from 'filesize'
 import IFile from '@models/file'
 import { useRouter } from 'next/router'
 import TasksLsi from '@lsi/tasks/index.lsi'
 import GlobalLsi from '@lsi/global.lsi'
+import FilesService from '@services/files.service'
 
 export interface TaskComponentProps {
     task: ITask
@@ -73,7 +73,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
 
     function download(e: React.MouseEvent<HTMLLIElement>, file: IFile) {
         e.preventDefault()
-        downloadFile(file)
+        FilesService.downloadFile(file)
     }
 
     function executansList(): string {

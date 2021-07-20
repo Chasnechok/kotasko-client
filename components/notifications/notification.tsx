@@ -4,12 +4,12 @@ import { ChevronUpIcon, DownloadIcon, EyeIcon } from '@heroicons/react/outline'
 import { Disclosure } from '@headlessui/react'
 import IUser from '@models/user'
 import filesize from 'filesize'
-import downloadFile from '../../http/download-file'
 import Link from 'next/link'
 import NotificationsService from '@services/notifications.service'
 import useLocale from '@hooks/useLocale'
 import NotificationsLsi from '@lsi/notifications/index.lsi'
 import UsersService from '@services/users.service'
+import FilesService from '@services/files.service'
 
 interface NotificationProps {
     notification: INotification
@@ -50,7 +50,7 @@ const Notification: React.FC<NotificationProps> = ({ notification, currUser }) =
                     </span>
                 </div>
                 <span
-                    onClick={() => downloadFile(notification.referencedFile)}
+                    onClick={() => FilesService.downloadFile(notification.referencedFile)}
                     className="text-xs cursor-pointer hover:text-blue-600 flex items-center"
                 >
                     <span className="hidden lg:inline">{NotificationsLsi.download[locale]}</span>

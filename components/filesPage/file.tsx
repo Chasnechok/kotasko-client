@@ -1,7 +1,6 @@
 import IFile from '@models/file'
 import { DownloadIcon, TrashIcon, ShareIcon } from '@heroicons/react/solid'
 import { Fragment, useState, useEffect } from 'react'
-import downloadFile from '../../http/download-file'
 import filesize from 'filesize'
 import FileIcon from './file-icon'
 import ShareForm from './share-form'
@@ -82,7 +81,7 @@ const FileComponent: React.FC<FileComponentProps> = ({ file, user }) => {
             </div>
             <div className="flex items-center gap-x-4">
                 <div
-                    onClick={() => downloadFile(file)}
+                    onClick={() => FilesService.downloadFile(file)}
                     className={`${
                         deleteTriggered ? 'hidden' : 'block'
                     } md:p-2 group flex items-center hover:text-blue-600 cursor-pointer`}

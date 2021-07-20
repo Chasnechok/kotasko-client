@@ -1,9 +1,9 @@
 import { PaperClipIcon } from '@heroicons/react/outline'
 import UsersService from '@services/users.service'
 import fileSize from 'filesize'
-import downloadFile from '../../http/download-file'
 import { IMessage, MessagesTypes } from '@models/message'
 import IUser from '@models/user'
+import FilesService from '@services/files.service'
 
 interface ChatMessageProps {
     message: IMessage
@@ -49,7 +49,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, user }) => {
                         </div>
                         <div className="select-none max-w-1/2 overflow-x-auto">
                             <p
-                                onClick={() => downloadFile(at)}
+                                onClick={() => FilesService.downloadFile(at)}
                                 className="text-xs font-medium underline cursor-pointer"
                             >
                                 {at.originalname}
