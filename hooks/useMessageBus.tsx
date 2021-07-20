@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { API_URL } from '../http'
-import { IMessage } from '../models/message'
+import { IMessage } from '@models/message'
 import { io, Socket } from 'socket.io-client'
 import useSWR from 'swr'
 import Router from 'next/router'

@@ -62,9 +62,9 @@ export function useNotifications() {
         socket.current.emit('room')
         socket.current.io.on('reconnect', () => socket.current.emit('room'))
         socket.current.on('notification', (nf: INotification) => {
-            const onFilesPage = document.location.pathname == '/files'
-            const onTasksPage = document.location.pathname == '/tasks'
-            const onChoresPage = document.location.pathname == '/chores'
+            const onFilesPage = document.location.pathname.includes('/files')
+            const onTasksPage = document.location.pathname.includes('/tasks')
+            const onChoresPage = document.location.pathname.includes('/chores')
             const taskShared = onTasksPage && document.location.search.includes('shared=true')
             const choresActive = onTasksPage && document.location.search.includes('active=true')
             switch (nf.type) {
