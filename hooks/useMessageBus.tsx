@@ -17,6 +17,7 @@ export function useMessageBus(busId: string) {
         socket.current = io(API_URL + '/chat', {
             withCredentials: true,
             transports: ['websocket'],
+            closeOnBeforeunload: false,
         })
         socket.current.on('connect', () => socket.current.emit('room', { entityId: busId }))
         socket.current.io.on('reconnect', () => socket.current.emit('room', { entityId: busId }))

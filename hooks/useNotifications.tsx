@@ -58,8 +58,9 @@ export function useNotifications() {
         socket.current = io(API_URL + '/notifications', {
             withCredentials: true,
             transports: ['websocket'],
+            closeOnBeforeunload: false,
         })
-        socket.current.emit('room')
+        socket.current.on('connect', () => socket.current.emit('room'))
         socket.current.io.on('reconnect', () => socket.current.emit('room'))
         socket.current.on('notification', (nf: INotification) => {
             const onFilesPage = document.location.pathname.includes('/files')
@@ -75,7 +76,6 @@ export function useNotifications() {
                 case NotificationsTypes.FILE_UNSHARED:
                     if (onFilesPage && mutateFiles) mutateFiles()
                     removeNotificationByEntity('referencedFile', nf.referencedFile)
-                    socket.current.emit('list')
                     break
                 case NotificationsTypes.NEW_TASK:
                     if (onTasksPage && mutateTasks) mutateTasks()

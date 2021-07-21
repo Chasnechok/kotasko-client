@@ -22,6 +22,8 @@ class MyDocument extends Document {
                     <meta name="msapplication-tap-highlight" content="no" />
                     <meta name="theme-color" content="#000000" />
                     <meta name="google" content="notranslate" />
+                    <meta name="apple-mobile-web-app-capable" content="yes"></meta>
+                    <meta name="apple-mobile-web-app-status-bar-style" content="white"></meta>
                     <link rel="apple-touch-icon" href="/icons/logos/logo-80.png" />
                     <link rel="apple-touch-icon" sizes="152x152" href="/icons/logos/logo-152.png" />
                     <link rel="apple-touch-icon" sizes="180x180" href="/icons/logos/logo-180.png" />

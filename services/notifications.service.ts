@@ -15,6 +15,7 @@ export default class NotificationsService {
                 isSeen: true,
             })
         } catch (error) {
+            if (error.response?.status == 404) return
             AlertsService.alertFromError(error)
         }
     }

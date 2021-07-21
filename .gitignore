@@ -16,6 +16,7 @@
 
 /public/sw.*
 /public/workbox*
+/public/worker*
 
 # production
 /build
