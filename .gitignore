@@ -12,6 +12,11 @@
 /.next/
 /out/
 
+# SW
+
+/public/sw.*
+/public/workbox*
+
 # production
 /build
 

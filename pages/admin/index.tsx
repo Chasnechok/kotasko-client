@@ -42,7 +42,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ userFromSession }) => {
                 <Fragment>
                     <Head>
                         <title>Kotasko | {Lsi.pageName[locale]}</title>
-                        <link rel="icon" href="/favicon.ico" />
                     </Head>
                     <section className="flex flex-wrap h-full justify-center">
                         <OrgCreateForm

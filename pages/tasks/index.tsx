@@ -53,7 +53,6 @@ const TasksPage: React.FC<TasksPageProps> = ({ userFromSession }) => {
                 <Fragment>
                     <Head>
                         <title>Kotasko | {Lsi.pageName[locale]}</title>
-                        <link rel="icon" href="/favicon.ico" />
                     </Head>
 
                     {user && (

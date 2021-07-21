@@ -44,10 +44,9 @@ const Login: FC = () => {
     }
 
     return (
-        <div className="h-screen bg-gray-100 flex justify-center items-center w-full">
+        <div className="h-screen bg-gray-100 text-blue-900 flex justify-center items-center w-full">
             <Head>
                 <title>{Lsi.pageName[locale]}</title>
-                <link rel="icon" href="/favicon.ico" />
             </Head>
 
             <LoginDialog isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen} />
