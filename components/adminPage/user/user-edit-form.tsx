@@ -48,8 +48,8 @@ const UserEditForm: React.FC<UserEditFormProps> = ({ formOpened, setFormOpened, 
 
     async function handleResetUser() {
         const updated = await UsersService.resetUser(user)
-        setTargetUser((u) => ({ ...u, password: updated.password }))
         setResetTriggered(false)
+        setTargetUser((u) => ({ ...u, password: updated.password }))
     }
 
     async function handleDepartmentChange() {
@@ -239,7 +239,7 @@ const UserEditForm: React.FC<UserEditFormProps> = ({ formOpened, setFormOpened, 
                                             className="justify-between"
                                             checked={targetUser && targetUser.roles.includes(role)}
                                             onChange={(shouldAdd) => handleEditRoles(shouldAdd, role)}
-                                            label={UsersService.getRoleName(role)}
+                                            label={UsersService.getRoleName(role, locale)}
                                         />
                                     </li>
                                 ))}

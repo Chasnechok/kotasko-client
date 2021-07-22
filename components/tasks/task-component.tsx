@@ -80,7 +80,10 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
         if (!task.assignedTo || !task.assignedTo.length) return TasksLsi.executansNotSet[locale]
         let string = ''
         task.assignedTo.forEach((u, i) => {
-            string += i == task.assignedTo.length - 1 ? UsersService.formatName(u) : `${UsersService.formatName(u)}, `
+            string +=
+                i == task.assignedTo.length - 1
+                    ? UsersService.formatName(u, locale)
+                    : `${UsersService.formatName(u, locale)}, `
         })
         return string
     }
@@ -253,7 +256,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, currUser }) => {
                             {task.details || GlobalLsi.noDesc[locale]}
                         </p>
                         <p className="text-gray-600 py-2 text-sm">
-                            Поручитель: {UsersService.formatName(task.creator)}
+                            Поручитель: {UsersService.formatName(task.creator, locale)}
                         </p>
                         <p className="text-gray-600 py-2 text-sm">
                             {TasksLsi.executans[locale]}: {executansList()}

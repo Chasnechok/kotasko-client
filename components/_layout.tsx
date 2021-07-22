@@ -1,8 +1,7 @@
-import { Fragment, ReactChild, ReactElement, FC, useState, useRef, useCallback } from 'react'
+import { Fragment, ReactChild, ReactElement, FC, useState, useRef, useCallback, useEffect } from 'react'
 import Link from 'next/link'
 import $api from '../http'
 import { useRouter } from 'next/router'
-import GlobalLsi from '@lsi/global.lsi'
 import Lsi from '@lsi/layout/index.lsi'
 import Logo from './logo'
 import MenuIcon from './layout/meni-icon'
@@ -58,6 +57,10 @@ const Layout: FC_CustomChildren<LayoutProps> = ({ children, userFromSession }) =
         setMenuOpened(state)
     }
     const { user, loading, mutate: mutateCurrUser } = useUser(userFromSession)
+
+    useEffect(() => {
+        if (userFromSession._id !== user._id) mutateCurrUser()
+    }, [])
 
     async function logout() {
         try {

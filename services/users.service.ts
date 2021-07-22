@@ -7,8 +7,8 @@ import Router from 'next/router'
 import UserCreateLsi from '@lsi/admin/user-create.lsi'
 
 export default class UsersService {
-    static formatName(user: IUser) {
-        if (!user || !user.details) return UserCreateLsi.userUnknown[Router.locale]
+    static formatName(user: IUser, locale: string = 'ru') {
+        if (!user || !user.details) return UserCreateLsi.userUnknown[locale]
         return user.details.firstName + ' ' + user.details.lastName
     }
     static async register(login, firstName, lastName, quota) {
@@ -164,16 +164,16 @@ export default class UsersService {
         return `+38 (${match[1]}) ${match[2]}-${match[3]}-${match[4]}`
     }
 
-    static getRoleName(roleType: UserRoleTypes): string {
+    static getRoleName(roleType: UserRoleTypes, locale: string = 'ru'): string {
         switch (roleType) {
             case UserRoleTypes.ADMIN:
-                return UserCreateLsi.typeAdmin[Router.locale]
+                return UserCreateLsi.typeAdmin[locale]
             case UserRoleTypes.REVISOR:
-                return UserCreateLsi.typeRevisor[Router.locale]
+                return UserCreateLsi.typeRevisor[locale]
             case UserRoleTypes.TECHNICIAN:
-                return UserCreateLsi.typeTechnician[Router.locale]
+                return UserCreateLsi.typeTechnician[locale]
             case UserRoleTypes.USER:
-                return UserCreateLsi.typeUser[Router.locale]
+                return UserCreateLsi.typeUser[locale]
         }
     }
 }

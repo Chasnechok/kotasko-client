@@ -217,7 +217,7 @@ const ChoreComponent: React.FC<ChoreComponentProps> = ({ chore, currUser, mutate
                             }
                             `}
                         >
-                            {UsersService.formatName(chore.creator)}
+                            {UsersService.formatName(chore.creator, locale)}
                         </p>
                         {chore.creator.department && (
                             <p className="text-sm">

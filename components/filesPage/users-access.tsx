@@ -67,7 +67,7 @@ const UsersAccess: React.FC<UsersAccessProps> = ({ usersWithAccess, setUsersAcce
                                     <Switch.Group>
                                         <div className="flex flex-nowrap items-center justify-between">
                                             <Switch.Label className="mr-4 flex-1">
-                                                <p className="font-medium">{UsersService.formatName(user)}</p>
+                                                <p className="font-medium">{UsersService.formatName(user, locale)}</p>
                                                 <p>{user.department ? user.department.name : ''}</p>
                                             </Switch.Label>
                                             <Switch

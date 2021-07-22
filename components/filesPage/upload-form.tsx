@@ -9,6 +9,7 @@ import { MUTATE_FILE_LIST as mutateList } from '@pages/files'
 import useLocale from '@hooks/useLocale'
 import UploadFormLsi from '@lsi/files/upload-form.lsi'
 import ShareFormLsi from '@lsi/files/share-form.lsi'
+import { mutate } from 'swr'
 interface UploadFormProps {
     files: FileList
     setFiles: Dispatch<SetStateAction<FileList>>
@@ -30,6 +31,7 @@ const UploadForm: React.FC<UploadFormProps> = ({ files, setFiles, user }) => {
     async function handleUploadFiles() {
         setIsLoading(true)
         await FilesService.uploadFiles(Array.from(files), usersAccess)
+        await mutate('/users/info')
         if (mutateList) mutateList()
         setFiles(null)
         setUsersAccess([])
@@ -58,7 +60,9 @@ const UploadForm: React.FC<UploadFormProps> = ({ files, setFiles, user }) => {
                     ))}
             </ul>
             <div className="py-1">
-                <h3 className="text-lg font-medium leading-6 text-gray-900 select-none">Доступ к файлу</h3>
+                <h3 className="text-lg font-medium leading-6 text-gray-900 select-none">
+                    {ShareFormLsi.fileAccess[locale]}
+                </h3>
                 <p className="pt-1 text-sm text-gray-500 select-none">
                     {!usersAccess.length
                         ? ShareFormLsi.accessOnlyYou[locale]

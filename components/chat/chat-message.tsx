@@ -4,6 +4,7 @@ import fileSize from 'filesize'
 import { IMessage, MessagesTypes } from '@models/message'
 import IUser from '@models/user'
 import FilesService from '@services/files.service'
+import useLocale from '@hooks/useLocale'
 
 interface ChatMessageProps {
     message: IMessage
@@ -12,6 +13,7 @@ interface ChatMessageProps {
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ message, user }) => {
     const isSender = message.sender && message.sender._id === user._id
+    const { locale } = useLocale()
     function isSystemMessage(message: IMessage): boolean {
         return [MessagesTypes.INCHORE_SYS_MESSAGE, MessagesTypes.INTASK_SYS_MESSAGE].includes(message.type)
     }
@@ -38,7 +40,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, user }) => {
                 })}
             </p>
             <h1 className="overflow-x-auto text-xs sm:text-sm select-none font-medium">
-                {UsersService.formatName(message.sender)}
+                {UsersService.formatName(message.sender, locale)}
             </h1>
             <span className="max-w-full break-words text-xs sm:text-sm whitespace-pre-line">{message.content}</span>
             {message.attachments &&

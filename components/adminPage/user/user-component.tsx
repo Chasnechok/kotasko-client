@@ -39,7 +39,7 @@ const UserComponent: React.FC<UserComponentProps> = ({ user, onClick }) => {
             onClick={onClick}
         >
             {userStateComponent(user)}
-            <h1 className="font-medium py-2 leading-none">{UsersService.formatName(user)}</h1>
+            <h1 className="font-medium py-2 leading-none">{UsersService.formatName(user, locale)}</h1>
         </li>
     )
 }

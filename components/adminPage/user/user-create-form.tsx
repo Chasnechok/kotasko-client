@@ -75,7 +75,7 @@ const UserCreateForm: React.FC<UserCreateFormProps> = ({ formOpened, setFormOpen
                         <p className="select-none">{UserCreateLsi.nameSurname[locale]}</p>
                         <div className="relative">
                             <input
-                                value={UsersService.formatName(createdUser)}
+                                value={UsersService.formatName(createdUser, locale)}
                                 readOnly
                                 onClick={copyToClipboard}
                                 className="border cursor-pointer z-10 border-gray-500 text-gray-500 focus:text-gray-600 rounded-md w-full py-2 px-3 leading-tight focus:outline-none"

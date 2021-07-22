@@ -34,6 +34,10 @@ const AlertComponent: React.FC<AlertComponentProps> = ({ alert }) => {
         }
     }, [isShown])
 
+    useEffect(() => {
+        return removeAlert
+    }, [])
+
     function removeAlert() {
         AlertsService.removeAlert(alert)
     }

@@ -32,7 +32,7 @@ const Notification: React.FC<NotificationProps> = ({ notification, currUser }) =
     }, [opened, notification])
 
     function formatName(user: IUser): string {
-        return `${NotificationsLsi.from[locale]}: ${UsersService.formatName(user)}`
+        return `${NotificationsLsi.from[locale]}: ${UsersService.formatName(user, locale)}`
     }
     function formatDate(dateString: string): string {
         const d = new Date(dateString)

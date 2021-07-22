@@ -49,7 +49,7 @@ const ButtonCountdown: React.FC<ButtonCountdownProps> = ({
             </span>
             <div
                 className={`w-full ${
-                    triggered ? 'animate-delete-bar' : 'hidden'
+                    triggered ? 'animate-delete-bar' : 'translate-x-full'
                 } left-0 top-0 absolute opacity-60 h-full bg-red-300 z-0`}
             ></div>
         </button>
