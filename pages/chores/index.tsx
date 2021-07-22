@@ -13,7 +13,6 @@ import ChoreComponent from '@components/choresPage/chore-component'
 import { PlusIcon } from '@heroicons/react/outline'
 import ChoreCreateForm from '@components/choresPage/chore-create-form'
 import axios from 'axios'
-import { withLocale } from 'HOC/withLocale'
 
 export let MUTATE_CHORE_LIST
 
@@ -109,7 +108,7 @@ const ChoresPage: React.FC<ChoresPageProps> = ({ userFromSession }) => {
     )
 }
 
-export const getServerSideProps = withLocale(async ({ req }) => {
+export async function getServerSideProps({ req }) {
     try {
         const user = await axios.get<IUser>('http://localhost:5000/auth/checkSession', {
             headers: {
@@ -137,6 +136,6 @@ export const getServerSideProps = withLocale(async ({ req }) => {
             },
         }
     }
-})
+}
 
 export default ChoresPage

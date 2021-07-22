@@ -14,7 +14,6 @@ import { useRouter } from 'next/router'
 import { PlusIcon } from '@heroicons/react/outline'
 import axios from 'axios'
 import TasksLsi from '@lsi/tasks/index.lsi'
-import { withLocale } from 'HOC/withLocale'
 
 export let MUTATE_TASK_LIST
 
@@ -112,7 +111,7 @@ const TasksPage: React.FC<TasksPageProps> = ({ userFromSession }) => {
     )
 }
 
-export const getServerSideProps = withLocale(async ({ req }) => {
+export async function getServerSideProps({ req }) {
     try {
         const user = await axios.get<IUser>('http://localhost:5000/auth/checkSession', {
             headers: {
@@ -132,6 +131,6 @@ export const getServerSideProps = withLocale(async ({ req }) => {
             },
         }
     }
-})
+}
 
 export default TasksPage

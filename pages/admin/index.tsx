@@ -15,7 +15,6 @@ import UserCreateForm from '@components/adminPage/user/user-create-form'
 import UserEditForm from '@components/adminPage/user/user-edit-form'
 import axios from 'axios'
 import useLocale from '@hooks/useLocale'
-import { withLocale } from 'HOC/withLocale'
 
 interface AdminPageProps {
     userFromSession: IUser
@@ -87,13 +86,21 @@ const AdminPage: React.FC<AdminPageProps> = ({ userFromSession }) => {
     )
 }
 
-export const getServerSideProps = withLocale(async ({ req }) => {
+export async function getServerSideProps({ req }) {
     try {
         const user = await axios.get<IUser>('http://localhost:5000/auth/checkSession', {
             headers: {
                 Cookie: formatReqCookies(req),
             },
         })
+        if (!user.data.roles.includes(UserRoleTypes.ADMIN)) {
+            return {
+                redirect: {
+                    destination: '/files',
+                    permanent: false,
+                },
+            }
+        }
         return {
             props: {
                 userFromSession: user.data,
@@ -107,6 +114,6 @@ export const getServerSideProps = withLocale(async ({ req }) => {
             },
         }
     }
-})
+}
 
 export default AdminPage

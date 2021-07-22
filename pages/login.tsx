@@ -10,19 +10,24 @@ import useLocale from '@hooks/useLocale'
 import formatReqCookies from '../http/cookie'
 import useSWR from 'swr'
 import axios from 'axios'
-import { withLocale } from 'HOC/withLocale'
 
 const Login: FC = () => {
     const [loginError, setLoginError] = useState<{ ru: string; ua: string }>()
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
-    const { locale } = useLocale()
+    const { locale, setLocale } = useLocale()
     const { error } = useSWR('/auth/checkSession', { shouldRetryOnError: false })
     useEffect(() => {
         if (!error) {
             Router.replace('/files', null, { locale })
         }
     }, [error])
+    useEffect(() => {
+        const userLocale = document.cookie.replace(/(?:(?:^|.*;\s*)NEXT_LOCALE\s*\=\s*([^;]*).*$)|^.*$/, '$1')
+        if (locale !== userLocale) {
+            setLocale(userLocale)
+        }
+    }, [locale])
     async function handleLogin(e: SyntheticEvent, login: string, password: string) {
         try {
             e.preventDefault()
@@ -57,7 +62,7 @@ const Login: FC = () => {
 
 export default Login
 
-export const getServerSideProps = withLocale(async ({ req }) => {
+export async function getServerSideProps({ req }) {
     try {
         await axios.get('http://localhost:5000/auth/checkSession', {
             headers: {
@@ -73,4 +78,4 @@ export const getServerSideProps = withLocale(async ({ req }) => {
     } catch (error) {
         return { props: {} }
     }
-})
+}

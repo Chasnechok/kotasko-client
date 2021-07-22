@@ -38,7 +38,7 @@ interface LayoutProps {
 const Layout: FC_CustomChildren<LayoutProps> = ({ children, userFromSession }) => {
     const router = useRouter()
     const currentRoute = router.route
-    const { locale } = useLocale()
+    const { locale, setLocale } = useLocale()
     const [menuOpened, setMenuOpened] = useState(false)
     const [settingsOpened, setSettingsOpened] = useState(false)
     const overlayRef = useRef<HTMLDivElement>()
@@ -61,6 +61,13 @@ const Layout: FC_CustomChildren<LayoutProps> = ({ children, userFromSession }) =
     useEffect(() => {
         if (userFromSession._id !== user._id) mutateCurrUser()
     }, [])
+
+    useEffect(() => {
+        const userLocale = document.cookie.replace(/(?:(?:^|.*;\s*)NEXT_LOCALE\s*\=\s*([^;]*).*$)|^.*$/, '$1')
+        if (locale !== userLocale) {
+            setLocale(userLocale)
+        }
+    }, [locale])
 
     async function logout() {
         try {

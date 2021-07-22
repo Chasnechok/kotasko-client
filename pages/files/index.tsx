@@ -6,13 +6,12 @@ import Lsi from '@lsi/files/index.lsi'
 import { useRouter } from 'next/router'
 import DragArea from '@components/filesPage/dragarea'
 import UploadForm from '@components/filesPage/upload-form'
-import IUser, { UserStatesTypes } from '@models/user'
+import IUser from '@models/user'
 import InfiniteList from '@components/infinite-list'
 import IFile from '@models/file'
 import FileComponent from '@components/filesPage/file'
 import axios from 'axios'
 import Listbox from '@components/listbox'
-import { withLocale } from 'HOC/withLocale'
 interface HomePageProps {
     userFromSession: IUser
     // force rerender when state changes
@@ -91,7 +90,7 @@ const Home: React.FC<HomePageProps> = ({ userFromSession }) => {
     )
 }
 
-export const getServerSideProps = withLocale(async ({ req }) => {
+export async function getServerSideProps({ req }) {
     try {
         const user = await axios.get<IUser>('http://localhost:5000/auth/checkSession', {
             headers: {
@@ -111,6 +110,6 @@ export const getServerSideProps = withLocale(async ({ req }) => {
             },
         }
     }
-})
+}
 
 export default Home
