@@ -10,17 +10,14 @@ import useLocale from '@hooks/useLocale'
 import formatReqCookies from '../http/cookie'
 import useSWR from 'swr'
 import axios from 'axios'
-
-export interface LoginPageProps {
-    locale: string
-}
+import { withLocale } from 'HOC/withLocale'
 
 const Login: FC = () => {
     const [loginError, setLoginError] = useState<{ ru: string; ua: string }>()
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const { locale } = useLocale()
-    const { error } = useSWR('/auth/checkSession')
+    const { error } = useSWR('/auth/checkSession', { shouldRetryOnError: false })
     useEffect(() => {
         if (!error) {
             Router.replace('/files', null, { locale })
@@ -60,7 +57,7 @@ const Login: FC = () => {
 
 export default Login
 
-export async function getServerSideProps({ req }) {
+export const getServerSideProps = withLocale(async ({ req }) => {
     try {
         await axios.get('http://localhost:5000/auth/checkSession', {
             headers: {
@@ -76,4 +73,4 @@ export async function getServerSideProps({ req }) {
     } catch (error) {
         return { props: {} }
     }
-}
+})

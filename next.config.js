@@ -22,6 +22,7 @@ module.exports = withPWA({
     i18n: {
         locales: ['ru', 'ua'],
         defaultLocale: 'ru',
+        localeDetection: true,
     },
     async redirects() {
         return [

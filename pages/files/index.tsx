@@ -12,14 +12,14 @@ import IFile from '@models/file'
 import FileComponent from '@components/filesPage/file'
 import axios from 'axios'
 import Listbox from '@components/listbox'
+import { withLocale } from 'HOC/withLocale'
 interface HomePageProps {
     userFromSession: IUser
     // force rerender when state changes
-    userState: UserStatesTypes
 }
 export let MUTATE_FILE_LIST
 
-const Home: React.FC<HomePageProps> = ({ userFromSession, userState }) => {
+const Home: React.FC<HomePageProps> = ({ userFromSession }) => {
     const [userInputFiles, setUserInputFiles] = useState<FileList>()
     const router = useRouter()
     const showShared = router.query.shared == 'true'
@@ -91,7 +91,7 @@ const Home: React.FC<HomePageProps> = ({ userFromSession, userState }) => {
     )
 }
 
-export async function getServerSideProps({ req }) {
+export const getServerSideProps = withLocale(async ({ req }) => {
     try {
         const user = await axios.get<IUser>('http://localhost:5000/auth/checkSession', {
             headers: {
@@ -101,7 +101,6 @@ export async function getServerSideProps({ req }) {
         return {
             props: {
                 userFromSession: user.data,
-                userState: user.data.state,
             },
         }
     } catch (error) {
@@ -112,6 +111,6 @@ export async function getServerSideProps({ req }) {
             },
         }
     }
-}
+})
 
 export default Home

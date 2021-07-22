@@ -6,7 +6,9 @@ export default function useLocale() {
     const locales = router.locales
     const setLocale = (locale: string, e?: any) => {
         if (e && e.preventDefault) e.preventDefault()
-        return router.replace(router.route, null, {
+        document.cookie = 'NEXT_LOCALE= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'
+        document.cookie = 'NEXT_LOCALE=' + locale + ';path=/'
+        return router.replace({ pathname: router.pathname, query: router.query }, null, {
             shallow: true,
             locale,
         })

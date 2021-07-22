@@ -13,6 +13,7 @@ import ChoreComponent from '@components/choresPage/chore-component'
 import { PlusIcon } from '@heroicons/react/outline'
 import ChoreCreateForm from '@components/choresPage/chore-create-form'
 import axios from 'axios'
+import { withLocale } from 'HOC/withLocale'
 
 export let MUTATE_CHORE_LIST
 
@@ -108,18 +109,17 @@ const ChoresPage: React.FC<ChoresPageProps> = ({ userFromSession }) => {
     )
 }
 
-export async function getServerSideProps({ req }) {
+export const getServerSideProps = withLocale(async ({ req }) => {
     try {
         const user = await axios.get<IUser>('http://localhost:5000/auth/checkSession', {
             headers: {
                 Cookie: formatReqCookies(req),
             },
         })
-
         if (!user.data?.department?.isServiceAllowed && !user.data?.roles.includes(UserRoleTypes.TECHNICIAN)) {
             return {
                 redirect: {
-                    destination: '/',
+                    destination: '/files',
                     permanent: true,
                 },
             }
@@ -137,6 +137,6 @@ export async function getServerSideProps({ req }) {
             },
         }
     }
-}
+})
 
 export default ChoresPage
