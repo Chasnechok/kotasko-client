@@ -1,16 +1,16 @@
 import Router from 'next/router'
 import { useEffect } from 'react'
 import useSWR from 'swr'
-import IDepartment from '../models/department'
-import IOrganisation from '../models/organisation'
-import IUser, { UserRoleTypes } from '../models/user'
+import IDepartment from '@models/department'
+import IOrganisation from '@models/organisation'
+import IUser, { UserRoleTypes } from '@models/user'
 
 export function useUser(initialData: IUser) {
     const { data, mutate, error } = useSWR<IUser>('/users/info', {
         initialData,
     })
     const loading = !data && !error
-    const loggedOut = error && [401, 403].includes(error.status || error.response?.status)
+    checkLogin(error)
 
     // redirect a user from the admin page if admin role was removed from him
     useEffect(() => {
@@ -20,15 +20,8 @@ export function useUser(initialData: IUser) {
         }
     }, [data])
 
-    useEffect(() => {
-        if (loggedOut) {
-            Router.replace('/login')
-        }
-    }, [loggedOut])
-
     return {
         loading,
-        loggedOut,
         user: data,
         mutate,
     }
@@ -39,13 +32,7 @@ export function useActiveUsers() {
         revalidateOnFocus: false,
     })
     const loading = !data && !error
-    const loggedOut = error && [401, 403].includes(error.status || error.response?.status)
-
-    useEffect(() => {
-        if (loggedOut) {
-            Router.replace('/login')
-        }
-    }, [loggedOut])
+    checkLogin(error)
 
     return {
         loading,
@@ -60,12 +47,7 @@ export function useOrgList() {
         revalidateOnFocus: false,
     })
     const loading = !data && !error
-    const loggedOut = error && [401, 403].includes(error.status || error.response?.status)
-    useEffect(() => {
-        if (loggedOut) {
-            Router.replace('/login')
-        }
-    }, [loggedOut])
+    checkLogin(error)
     return {
         loading,
         error,
@@ -79,12 +61,7 @@ export function useDepList() {
         revalidateOnFocus: false,
     })
     const loading = !data && !error
-    const loggedOut = error && [401, 403].includes(error.status || error.response?.status)
-    useEffect(() => {
-        if (loggedOut) {
-            Router.replace('/login')
-        }
-    }, [loggedOut])
+    checkLogin(error)
     return {
         loading,
         error,
@@ -96,16 +73,20 @@ export function useDepList() {
 export function useAppUsers() {
     const { data, mutate, error } = useSWR<IUser[]>('/users/findAll')
     const loading = !data && !error
-    const loggedOut = error && [401, 403].includes(error.status || error.response?.status)
-    useEffect(() => {
-        if (loggedOut) {
-            Router.replace('/login')
-        }
-    }, [loggedOut])
+    checkLogin(error)
     return {
         loading,
         error,
         data,
         mutate,
     }
+}
+
+function checkLogin(error) {
+    const loggedOut = error && [401, 403].includes(error.status || error.response?.status)
+    useEffect(() => {
+        if (loggedOut) {
+            Router.replace('/login')
+        }
+    }, [loggedOut])
 }

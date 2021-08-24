@@ -64,7 +64,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onMessageInput, attachments, curr
                     setFormOpened={setFormOpened}
                     setInputAttachments={setInputAttachments}
                     initial={inputAttachments}
-                    single={attachments === 'single' ? true : false}
+                    single={attachments === 'single'}
                 />
             )}
             <div className="flex flex-wrap items-center">

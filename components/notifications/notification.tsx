@@ -22,9 +22,7 @@ const Notification: React.FC<NotificationProps> = ({ notification, currUser }) =
     useEffect(() => {
         let timer
         if (!notification.isSeen && opened) {
-            timer = setTimeout(async () => {
-                NotificationsService.setSeen(notification)
-            }, 200)
+            timer = setTimeout(() => NotificationsService.setSeen(notification), 200)
         }
         return () => {
             if (timer) clearTimeout(timer)

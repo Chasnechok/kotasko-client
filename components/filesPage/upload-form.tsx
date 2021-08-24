@@ -10,6 +10,7 @@ import useLocale from '@hooks/useLocale'
 import UploadFormLsi from '@lsi/files/upload-form.lsi'
 import ShareFormLsi from '@lsi/files/share-form.lsi'
 import { mutate } from 'swr'
+
 interface UploadFormProps {
     files: FileList
     setFiles: Dispatch<SetStateAction<FileList>>
@@ -46,10 +47,10 @@ const UploadForm: React.FC<UploadFormProps> = ({ files, setFiles, user }) => {
                     ? `${UploadFormLsi.userSpace[locale]} ${fileSize(user.spaceUsed)} ${
                           UploadFormLsi.outOf[locale]
                       } ${fileSize(user.quota)}`
-                    : UploadFormLsi.userSpaceUnlimeted[locale]
+                    : UploadFormLsi.userSpaceUnlimited[locale]
             }
             setFormOpened={() => null}
-            formOpened={files && files.length ? true : false}
+            formOpened={!!(files && files.length)}
         >
             <ul className="py-2 px-1 max-h-64 lg:max-h-80 overflow-auto">
                 {files &&

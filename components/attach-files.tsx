@@ -53,7 +53,7 @@ const AttachFiles: React.FC<AttachFilesProps> = ({ single, initial, setInputAtta
     function manageServerAttachments(file: IFile, attach: boolean) {
         if (attach) {
             if (single) {
-                setInputAttachments((v) => ({
+                setInputAttachments(() => ({
                     onServer: [file],
                     toUpload: [],
                 }))

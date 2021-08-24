@@ -97,7 +97,7 @@ const UserEditForm: React.FC<UserEditFormProps> = ({ formOpened, setFormOpened, 
             maxWidth="max-w-2xl"
         >
             {user && adminUser._id === user._id && (
-                <p className="pt-1 select-none text-sm text-red-500 underlinem">{UserEditLsi.warningSelf[locale]}</p>
+                <p className="pt-1 select-none text-sm text-red-500 underline">{UserEditLsi.warningSelf[locale]}</p>
             )}
             {!structureChoose && (
                 <div className="block md:flex gap-x-6">
@@ -247,11 +247,10 @@ const UserEditForm: React.FC<UserEditFormProps> = ({ formOpened, setFormOpened, 
                         </fieldset>
 
                         <fieldset className="flex flex-col mb-3 border border-gray-900 rounded-md py-2 px-2">
-                            <legend className="text-gray-900 px-2 select-none">{AdminLsi.structure[locale]}</legend>
+                            <legend className="text-gray-900 px-2 select-none">{AdminLsi.department[locale]}</legend>
                             <button
-                                style={{ maxWidth: '282px' }}
                                 onClick={() => setStructureChoose(true)}
-                                className="px-4 w-full overflow-hidden md:truncate mx-auto select-none py-2 text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+                                className="px-4 max-w-[282px] w-full overflow-hidden md:truncate mx-auto select-none py-2 text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
                             >
                                 {selectedDep?.name || UserEditLsi.setStructure[locale]}
                             </button>

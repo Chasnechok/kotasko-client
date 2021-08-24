@@ -143,11 +143,11 @@ export default class UsersService {
         }
     }
 
-    static async finishRegistartion(password: string, department: IDepartment, room: string, mobile: string) {
+    static async finishRegistration(password: string, department: IDepartment, room: string, mobile: string) {
         try {
             const dtoIn = { password, department: department?._id, room }
             const updated = await $api.patch<IUser>(
-                '/auth/finishRegistartion',
+                '/auth/finishRegistration',
                 mobile.length == 13 ? Object.assign(dtoIn, { mobile }) : dtoIn
             )
             AlertsService.addAlert({ content: UserCreateLsi.onReg[Router.locale], theme: 'success' })

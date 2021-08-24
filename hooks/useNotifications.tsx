@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
-import { Socket, io } from 'socket.io-client'
+import { io, Socket } from 'socket.io-client'
 import { API_URL } from '../http'
 import INotification, { NotificationsTypes } from '../models/notification'
 import { MUTATE_CHORE_LIST as mutateChores } from '../pages/chores'
@@ -40,8 +40,7 @@ export function setSeen(nf: INotification) {
     return mutate(
         '/notifications',
         (nfs: INotification[]) => {
-            const r = nfs.map((n) => ({ ...n, isSeen: n._id == nf._id || n.isSeen }))
-            return r
+            return nfs.map((n) => ({ ...n, isSeen: n._id == nf._id || n.isSeen }))
         },
         false
     )

@@ -3,7 +3,7 @@ import GlobalLsi from '@lsi/global.lsi'
 import { Dispatch, SetStateAction } from 'react'
 import DialogModal from './dialog-modal'
 
-interface ComfirmDialogProps {
+interface ConfirmDialogProps {
     title: string
     onFire: () => void
     opened: boolean
@@ -11,7 +11,7 @@ interface ComfirmDialogProps {
     description?: string
 }
 
-const ConfirmDialog: React.FC<ComfirmDialogProps> = ({ title, description, onFire, opened, setOpened }) => {
+const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ title, description, onFire, opened, setOpened }) => {
     const { locale } = useLocale()
     return (
         <DialogModal formOpened={opened} setFormOpened={setOpened} description={description || ''} title={title}>

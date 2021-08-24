@@ -1,4 +1,4 @@
-import { ReactChild, PropsWithChildren, useRef, useEffect, useCallback, FC, MutableRefObject } from 'react'
+import { FC, MutableRefObject, PropsWithChildren, ReactChild, useCallback, useEffect, useRef } from 'react'
 import { PuffLoader } from 'react-spinners'
 import { useSWRInfinite } from 'swr'
 import EmptyIcon from '../../public/icons/empty.svg'
@@ -53,7 +53,7 @@ function InfiniteList<Entity extends FC<InfiniteListProps<Entity>>>({
             if (observer.current) observer.current.disconnect()
             observer.current = new IntersectionObserver(
                 ([entry]) => {
-                    if (entry.isIntersecting && hasMore) setSize((prev) => prev + 1)
+                    if (entry.isIntersecting && hasMore) setSize((prev) => prev + 1).catch(console.log)
                 },
                 {
                     root: rootRef ? rootRef.current : null,

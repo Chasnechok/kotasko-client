@@ -12,7 +12,7 @@ const ErrorBlock: React.FC<ErrorBlockProps> = ({
 }) => {
     return (
         <Transition
-            show={loginError ? true : false}
+            show={!!loginError}
             appear
             enter="ease-out duration-500"
             enterFrom="opacity-0"

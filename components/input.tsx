@@ -30,7 +30,7 @@ const Input: React.FC<InputProps> = ({ label, required, id, placeholder, value, 
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     readOnly={readonly}
-                ></textarea>
+                />
             ) : (
                 <input
                     className="mt-1 appearance-none border border-gray-500 text-gray-500 focus:text-gray-600 rounded-md w-full py-2 px-3 leading-tight focus:border-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-1"

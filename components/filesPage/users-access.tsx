@@ -4,8 +4,8 @@ import { useState, useEffect, Dispatch, SetStateAction } from 'react'
 import IUser from '../../models/user'
 import Search, { SearchEntities } from '../search'
 import PuffLoader from 'react-spinners/PuffLoader'
-import { useActiveUsers } from '../../hooks/useFetchCollection'
-import UsersService from '../../services/users.service'
+import { useActiveUsers } from '@hooks/useFetchCollection'
+import UsersService from '@services/users.service'
 import GlobalLsi from '@lsi/global.lsi'
 import useLocale from '@hooks/useLocale'
 
@@ -62,7 +62,6 @@ const UsersAccess: React.FC<UsersAccessProps> = ({ usersWithAccess, setUsersAcce
                                             ? 'text-blue-900 bg-blue-100 hover:bg-blue-200 focus-visible:ring-blue-500'
                                             : 'text-gray-700 bg-gray-100 hover:bg-gray-200 focus-visible:ring-gray-500'
                                     } relative py-3 px-4 rounded-md max-h-60 focus:outline-none text-sm`}
-                                    value={null}
                                 >
                                     <Switch.Group>
                                         <div className="flex flex-nowrap items-center justify-between">

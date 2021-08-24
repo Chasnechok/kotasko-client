@@ -7,7 +7,7 @@ const UploadFormLsi = {
         ru: 'Загрузить',
         ua: 'Завантажити',
     },
-    userSpaceUnlimeted: {
+    userSpaceUnlimited: {
         ru: 'Ваше хранилище безлимитно',
         ua: 'Ваше сховище безлімітно',
     },

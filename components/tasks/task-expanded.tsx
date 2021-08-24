@@ -1,6 +1,6 @@
 import { ClipboardCheckIcon, PlusIcon } from '@heroicons/react/outline'
 import IUser from '../../models/user'
-import { MessagesTypes } from '../../models/message'
+import { MessagesTypes } from '@models/message'
 import Chat from '../chat'
 import { useRouter } from 'next/router'
 import TasksLsi from '@lsi/tasks/index.lsi'

@@ -68,9 +68,9 @@ const FinishReg: React.FC<FinishRegProps> = ({ formOpened, setFormOpened, target
 
     async function handleFinishReg() {
         setIsLoading(true)
-        const updated = await UsersService.finishRegistartion(password, selectedDep, room, mobile)
+        const updated = await UsersService.finishRegistration(password, selectedDep, room, mobile)
         setIsLoading(false)
-        mutateCurrUser((user) => updated, false)
+        mutateCurrUser(() => updated, false)
     }
 
     return (

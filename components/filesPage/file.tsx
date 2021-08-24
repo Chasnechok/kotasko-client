@@ -52,7 +52,7 @@ const FileComponent: React.FC<FileComponentProps> = ({ file, user }) => {
                 className={`w-full ${
                     deleteTriggered ? 'animate-delete-bar' : 'hidden'
                 } left-0 absolute h-full bg-red-700 opacity-20`}
-            ></div>
+            />
             <ShareForm user={user} formOpened={shareFormOpened} setFormOpened={setShareFormOpened} file={file} />
             <div className="relative w-1/2 md:w-max">
                 <div className="hidden absolute md:block left-0 top-1/2 -translate-y-1/2">

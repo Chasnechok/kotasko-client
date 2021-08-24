@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { ChoreTypes } from '../../models/chore'
+import { ChoreTypes } from '@models/chore'
 import VirusIcon from '../../public/icons/chores/virus.svg'
 import OtherIcon from '../../public/icons/chores/service.svg'
 import PrineterMaintenanceIcon from '../../public/icons/chores/printer-maintenance.svg'
