@@ -88,7 +88,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ userFromSession }) => {
 
 export async function getServerSideProps({ req }) {
     try {
-        const user = await axios.get<IUser>('http://localhost:5000/auth/checkSession', {
+        const user = await axios.get<IUser>(process.env.LOCAL_SERVER_URL + '/auth/checkSession', {
             headers: {
                 Cookie: formatReqCookies(req),
             },

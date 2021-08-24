@@ -64,7 +64,7 @@ export default Login
 
 export async function getServerSideProps({ req }) {
     try {
-        await axios.get('http://localhost:5000/auth/checkSession', {
+        await axios.get(process.env.LOCAL_SERVER_URL + '/auth/checkSession', {
             headers: {
                 Cookie: formatReqCookies(req),
             },
