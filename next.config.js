@@ -4,7 +4,7 @@ module.exports = withPWA({
     pwa: {
         dest: 'public',
         register: false,
-        dynamicStartUrlRedirect: '/files',
+        dynamicStartUrlRedirect: '/login',
         runtimeCaching: [
             {
                 urlPattern: /.*/i,
