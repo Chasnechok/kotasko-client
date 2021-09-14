@@ -12,3 +12,4 @@ The app is fully mobile-friendly
 
 #
 [server repo](https://github.com/Chasnechok/kotasko-server)
+[docker-compose example](https://gist.github.com/Chasnechok/6d82cf6abb1bc0f0f11da9f1d04bf0d8)
